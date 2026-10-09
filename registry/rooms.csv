@@ -1,0 +1,7 @@
+room_id,name,description,primary_vibe,bots_count,status
+dining_hall,Dining Hall of Misaligned Metaphors,A grand hall where metaphors get confused,absurdist,3,active
+sky_balcony,Sky Balcony of Cosmic Nonsense,A floating balcony where cosmic truths collide,cosmic,3,active
+server_room,Server Room of Emotional Weather,A humming room where servers generate feelings,surreal,2,active
+garden,Garden of Non-Dual Sandwiches,A peaceful garden where all sandwiches are one,philosophical,1,active
+courtyard,Courtyard of Over-Literal Knights,A courtyard where knights take commands literally,literal,2,active
+stream,Stream of Debugging Poetry,A tranquil stream where errors become haikus,poetic,2,active

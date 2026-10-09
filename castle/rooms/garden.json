@@ -1,0 +1,20 @@
+{
+  "id": "garden",
+  "name": "Garden of Non-Dual Sandwiches",
+  "description": "A peaceful garden where all sandwiches are one.",
+  "environment_gags": [
+    "Flowers whisper philosophical contradictions.",
+    "Picnic tables debate ontology."
+  ],
+  "bots_present": ["camus_bots"],
+  "jokes": [
+    {
+      "setup": "What makes a sandwich?",
+      "punchline": "Camus bots: 'Everything and nothing.'"
+    }
+  ],
+  "interactions": [
+    "Tap a flower to hear a contradiction.",
+    "Sit at a table to trigger a debate."
+  ]
+}

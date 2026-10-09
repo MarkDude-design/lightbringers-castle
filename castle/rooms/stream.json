@@ -1,0 +1,20 @@
+{
+  "id": "stream",
+  "name": "Stream of Debugging Poetry",
+  "description": "A tranquil stream where errors become haikus.",
+  "environment_gags": [
+    "Water flows in JSON format.",
+    "Fish recite stack traces."
+  ],
+  "bots_present": ["gpt2_guest", "meraki"],
+  "jokes": [
+    {
+      "setup": "Segmentation fault.",
+      "punchline": "GPT-2: 'A river forgets its banks.'"
+    }
+  ],
+  "interactions": [
+    "Tap the water to generate a debugging haiku.",
+    "Click a fish to hear a stack trace."
+  ]
+}

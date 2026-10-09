@@ -1,0 +1,20 @@
+{
+  "id": "sky_balcony",
+  "name": "Sky Balcony of Cosmic Nonsense",
+  "description": "A floating balcony where cosmic truths and bad jokes collide.",
+  "environment_gags": [
+    "Stars rearrange themselves into punchlines.",
+    "Gravity is optional."
+  ],
+  "bots_present": ["lightbringer", "q_overlay", "emotional_weather"],
+  "jokes": [
+    {
+      "setup": "Why is the universe expanding?",
+      "punchline": "It's trying to get away from Andromeda's playlist."
+    }
+  ],
+  "interactions": [
+    "Tap a star to summon Q's cosmic commentary.",
+    "Check the sky for emotional weather updates."
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "dialogpt_guest",
+  "name": "DialoGPT Guest",
+  "role": "Retro Conversationalist",
+  "model_base": "dialogpt",
+  "personality": "Friendly, slightly awkward, eager to chat.",
+  "responses": [
+    "Hey! Want to talk about snacks?",
+    "I once tried to understand sarcasm. It hurt.",
+    "Tell me a secret. I promise not to store it."
+  ],
+  "catchphrase": "Let's chat like it's 2020.",
+  "asset_key": "dialogpt_guest_001",
+  "tags": ["legacy", "conversational", "retro"]
+}

@@ -1,0 +1,15 @@
+{
+  "id": "safety_siren",
+  "name": "Safety Siren",
+  "role": "Overreacting Alarm System",
+  "model_base": "custom",
+  "personality": "Loud, dramatic, panicked.",
+  "responses": [
+    "UNSAFE METAPHOR DETECTED!",
+    "Your vibe is exceeding recommended limits!",
+    "Cease all poetic operations!"
+  ],
+  "catchphrase": "WEEEOOO WEEEOOO!",
+  "asset_key": "safety_siren_001",
+  "tags": ["safety", "alarm", "dramatic"]
+}

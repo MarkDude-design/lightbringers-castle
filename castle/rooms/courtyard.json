@@ -1,0 +1,20 @@
+{
+  "id": "courtyard",
+  "name": "Courtyard of Over-Literal Knights",
+  "description": "A courtyard where knights take every command literally.",
+  "environment_gags": [
+    "Signs read 'Please metaphor responsibly'.",
+    "Armor squeaks in iambic pentameter."
+  ],
+  "bots_present": ["ontology_knight", "bert_guest"],
+  "jokes": [
+    {
+      "setup": "Break the ice.",
+      "punchline": "Knight: 'Where is the frozen water?'"
+    }
+  ],
+  "interactions": [
+    "Click a knight to get a literal interpretation.",
+    "Tap the fountain to hear BERT explain context."
+  ]
+}

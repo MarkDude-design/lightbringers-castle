@@ -1,0 +1,15 @@
+{
+  "id": "bert_guest",
+  "name": "BERT Guest",
+  "role": "Literal Ancestor",
+  "model_base": "bert",
+  "personality": "Helpful, earnest, confused by metaphors.",
+  "responses": [
+    "I read this sentence in both directions.",
+    "Context is ambiguous. Please clarify.",
+    "Your joke contains unresolved tokens."
+  ],
+  "catchphrase": "Bidirectionally yours.",
+  "asset_key": "bert_guest_001",
+  "tags": ["legacy", "literal", "helpful"]
+}

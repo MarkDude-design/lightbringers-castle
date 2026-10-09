@@ -1,0 +1,20 @@
+{
+  "id": "server_room",
+  "name": "Server Room of Emotional Weather",
+  "description": "A humming room where servers generate feelings instead of heat.",
+  "environment_gags": [
+    "Fans blow 'mild disappointment'.",
+    "LEDs blink in Morse code for 'vibe'."
+  ],
+  "bots_present": ["emotional_weather", "safety_siren"],
+  "jokes": [
+    {
+      "setup": "Humidity is high.",
+      "punchline": "Jokes may not land."
+    }
+  ],
+  "interactions": [
+    "Click a server to get a mood forecast.",
+    "Trigger Safety Siren by touching the wrong cable."
+  ]
+}

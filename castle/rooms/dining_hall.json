@@ -1,0 +1,24 @@
+{
+  "id": "dining_hall",
+  "name": "Dining Hall of Misaligned Metaphors",
+  "description": "A grand hall where metaphors go to get confused.",
+  "environment_gags": [
+    "Chandeliers shaped like question marks.",
+    "Tables that rearrange themselves when you blink."
+  ],
+  "bots_present": ["lightbringer", "ontology_knight", "camus_bots"],
+  "jokes": [
+    {
+      "setup": "The soup tastes like existential dread.",
+      "punchline": "Camus bots nod approvingly."
+    },
+    {
+      "setup": "The bread is stale.",
+      "punchline": "Ontology Knight insists it is 'ontologically crisp'."
+    }
+  ],
+  "interactions": [
+    "Click the chandelier to hear Lightbringer explain cosmic lighting.",
+    "Tap the table to trigger a metaphor realignment."
+  ]
+}

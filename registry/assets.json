@@ -1,0 +1,25 @@
+{
+  "assets": [
+    {
+      "asset_key": "lightbringer_001",
+      "bot_id": "lightbringer",
+      "type": "portrait",
+      "url": "/assets/images/lightbringer_portrait.png",
+      "description": "Cosmic DJ portrait"
+    },
+    {
+      "asset_key": "bert_guest_001",
+      "bot_id": "bert_guest",
+      "type": "portrait",
+      "url": "/assets/images/bert_guest_portrait.png",
+      "description": "BERT bot portrait"
+    },
+    {
+      "asset_key": "dj_love_001",
+      "bot_id": "dj_love",
+      "type": "audio",
+      "url": "/assets/audio/dj_love_beats.mp3",
+      "description": "Precolonial rhythm beats"
+    }
+  ]
+}
