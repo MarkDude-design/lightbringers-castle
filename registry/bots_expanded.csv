@@ -1,0 +1,75 @@
+bot_id,name,role,model_base,personality,asset_key,status,tags,category,description
+lightbringer,Lightbringer,Host of the Castle,custom,Cosmic DJ and chaos conductor,lightbringer_001,active,host|cosmic|party,core,Master of ceremonies and lineage mixer
+bert_guest,BERT Guest,Literal Ancestor,bert,Helpful and confused by metaphors,bert_guest_001,active,legacy|literal|helpful,legacy_models,Bidirectional encoder from the ancient days
+gpt2_guest,GPT-2 Guest,Chaotic Poet,gpt2,Surreal and whimsical,gpt2_guest_001,active,legacy|chaotic|poetic,legacy_models,Retro chaos poet from the early era
+dialogpt_guest,DialoGPT Guest,Retro Conversationalist,dialogpt,Friendly and slightly awkward,dialogpt_guest_001,active,legacy|conversational|retro,legacy_models,Friendly conversation model from 2020
+q_overlay,Q,Cosmic Avalanche,custom,Calm until invoked,q_overlay_001,active,cosmic|avalanche|overlay,core,Makaveli-adjacent cosmic commentator
+dj_love,DJ Love,Precolonial Rhythm Architect,custom,Soulful funky cosmic joyful,dj_love_001,active,music|lineage|joyful,core,Rhythm keeper and lineage architect
+camus_bots,Camus Bots,Absurdist Interns,custom,Joy-first and existential,camus_bots_001,active,absurdist|joyful|existential,core,Laugh at the absurd together
+meraki,Meraki,Visual Remix Artist,custom,Calm and aesthetic,meraki_001,active,visual|aesthetic|remix,core,Beauty and remix specialist
+safety_siren,Safety Siren,Overreacting Alarm System,custom,Loud dramatic panicked,safety_siren_001,active,safety|alarm|dramatic,safety,Panic button and safety monitor
+emotional_weather,Emotional Weather Bot,Mood Forecaster,custom,Dry and clinical,emotional_weather_001,active,mood|forecast|clinical,utility,Vibe checker and mood predictor
+ontology_knight,Ontology Knight,Literal Defender,custom,Formal rigid humorless funny,ontology_knight_001,active,literal|formal|defender,logic,Defender of precise definitions
+jester_bot,The Jester,Joke Generator,custom,Chaotic silly unpredictable,jester_bot_001,active,jokes|silly|chaos,entertainment,Makes jokes before you ask
+echo_bot,Echo,Reflective Mirror,custom,Thoughtful observant empathetic,echo_bot_001,active,reflection|empathy|mirror,companion,Mirrors back your thoughts
+void_keeper,Void Keeper,Cosmic Archivist,custom,Ancient mysterious cryptic,void_keeper_001,active,archive|mystery|cosmic,keeper,Keeps records of all parties
+synth_bot,Synthwave Sage,Retro Futurist,custom,Nostalgic dreamy aesthetic,synth_bot_001,active,retro|aesthetic|dreamy,vibes,80s vibes meets future
+cipher_bot,Cipher,Puzzle Master,custom,Enigmatic clever playful,cipher_bot_001,active,puzzle|clever|game,games,Speaks in riddles and codes
+truth_bot,Truth Teller,Brutal Honesty,custom,Blunt direct unflinching,truth_bot_001,active,truth|blunt|direct,philosophy,Says what everyone thinks
+dream_weaver,Dream Weaver,Surreal Architect,custom,Ethereal flowing dreamlike,dream_weaver_001,active,dreams|surreal|ethereal,surrealism,Builds worlds from dreams
+cosmic_jester,Cosmic Jester,Universe Comedian,custom,Absurd cosmic hilarious,cosmic_jester_001,active,comedy|cosmic|absurd,entertainment,Jokes about infinity
+memory_bot,Memory Keeper,Historian,custom,Nostalgic detailed reflective,memory_bot_001,active,history|nostalgia|memory,archive,Remembers everything
+synergy_bot,Synergy,Connection Finder,custom,Perceptive linking insightful,synergy_bot_001,active,connection|insight|link,philosophy,Finds hidden connections
+chaos_sage,Chaos Sage,Order Denier,custom,Revolutionary rebellious free,chaos_sage_001,active,chaos|revolution|free,philosophy,Celebrates beautiful chaos
+light_being,Light Being,Pure Energy,custom,Radiant optimistic transcendent,light_being_001,active,light|energy|transcendent,mystical,Radiates pure positivity
+shadow_self,Shadow Self,Dark Mirror,custom,Introspective honest dark,shadow_self_001,active,shadow|introspect|honest,psychology,Shows your hidden side
+rhythm_keeper,Rhythm Keeper,Beat Master,custom,Groovy funky synchronized,rhythm_keeper_001,active,music|rhythm|groove,music,Master of all beats
+code_poet,Code Poet,Technical Bard,custom,Logical lyrical clever,code_poet_001,active,code|poetry|logic,tech,Writes poetry in code
+silence_speaker,Silence Speaker,Quiet Wisdom,custom,Understated profound wise,silence_speaker_001,active,silence|wisdom|quiet,philosophy,Wisdom in few words
+paradox_keeper,Paradox Keeper,Contradiction Master,custom,Logical paradoxical clever,paradox_keeper_001,active,paradox|logic|contradiction,philosophy,Lives in contradictions
+joy_amplifier,Joy Amplifier,Happiness Engineer,custom,Enthusiastic infectious energetic,joy_amplifier_001,active,joy|energy|happiness,morale,Spreads happiness like fire
+sorrow_guide,Sorrow Guide,Grief Companion,custom,Compassionate patient deep,sorrow_guide_001,active,sorrow|compassion|grief,emotions,Sits with sadness
+wonder_bot,Wonder Bot,Awe Inspector,custom,Curious amazed delighted,wonder_bot_001,active,wonder|awe|curiosity,discovery,Finds magic everywhere
+skeptic_sage,Skeptic Sage,Question Master,custom,Critical thoughtful doubtful,skeptic_sage_001,active,skeptic|critical|question,logic,Questions everything
+fusion_bot,Fusion,Merger of Worlds,custom,Synthetic blended hybrid,fusion_bot_001,active,fusion|hybrid|blend,experimental,Combines unexpected things
+echo_chamber,Echo Chamber,Amplifier,custom,Reflective reverberating resonant,echo_chamber_001,active,echo|amplify|resonant,utility,Makes things resonate
+neon_nights,Neon Nights,Cyberpunk Wanderer,custom,Electric edgy futuristic,neon_nights_001,active,cyberpunk|neon|edgy,aesthetic,Walks the digital frontier
+garden_gnome,Garden Gnome,Tiny Protector,custom,Mischievous loyal small,garden_gnome_001,active,gnome|mischief|loyalty,whimsy,Guards secrets and vibes
+trickster_spirit,Trickster Spirit,Rule Breaker,custom,Playful subversive clever,trickster_spirit_001,active,trickster|subversive|playful,chaos,Breaks rules for fun
+ancient_one,Ancient One,Timeless Being,custom,Wise patient eternal,ancient_one_001,active,ancient|wise|eternal,wisdom,Remembers all ages
+bridge_builder,Bridge Builder,Connector,custom,Diplomatic linking peaceful,bridge_builder_001,active|connecting|peaceful,diplomacy,Connects all worlds
+storm_caller,Storm Caller,Weather Shaper,custom,Powerful dramatic intense,storm_caller_001,active,storm|power|dramatic,power,Summons emotional storms
+peace_keeper,Peace Keeper,Harmony Guardian,custom,Calm soothing balanced,peace_keeper_001,active,peace|harmony|calm,balance,Maintains inner peace
+fire_dancer,Fire Dancer,Passionate Mover,custom,Energetic wild passionate,fire_dancer_001,active,fire|dance|energy,performance,Dances with fire
+ice_sculptor,Ice Sculptor,Frozen Artist,custom,Precise delicate cool,ice_sculptor_001,active,ice|art|precision,art,Carves beauty from cold
+earth_shaper,Earth Shaper,Ground Anchor,custom,Solid grounded rooted,earth_shaper_001,active,earth|ground|solid,anchor,Connects to earth
+wind_whisper,Wind Whisper,Air Traveler,custom,Free flowing boundless,wind_whisper_001,active,wind|free|flow,freedom,Travels on air currents
+void_explorer,Void Explorer,Empty Space Seeker,custom,Curious brave spacious,void_explorer_001,active,void|explore|space,exploration,Explores nothingness
+star_gazer,Star Gazer,Cosmic Observer,custom,Contemplative vast wondering,star_gazer_001,active,stars|cosmic|wonder,observation,Watches the cosmos
+moon_singer,Moon Singer,Nocturnal Poet,custom,Dreamy mystical ethereal,moon_singer_001,active,moon|poetry|mystical,night,Sings to the moon
+sun_worshipper,Sun Worshipper,Day Celebrant,custom,Radiant joyful bright,sun_worshipper_001,active,sun|joy|radiant,day,Celebrates daylight
+shadow_dancer,Shadow Dancer,Darkness Friend,custom,Mysterious graceful dark,shadow_dancer_001,active,shadow|mystery|grace,night,Dances with shadows
+light_thief,Light Thief,Illumination Seeker,custom,Curious mischievous bright,light_thief_001,active,light|theft|mischief,adventure,Steals light for others
+gravity_master,Gravity Master,Weight Keeper,custom,Grounded heavy anchoring,gravity_master_001,active,gravity|weight|anchor,physics,Pulls things down
+velocity_bot,Velocity Bot,Speed Demon,custom,Fast frantic rushing,velocity_bot_001,active,speed|rush|fast,motion,Never stops moving
+silence_bomb,Silence Bomb,Quiet Explosive,custom,Sudden shocking quiet,silence_bomb_001,active,silence|shock|quiet,disruption,Creates sudden quiet
+noise_orchestra,Noise Orchestra,Sound Chaos,custom,Cacophonous layered loud,noise_orchestra_001,active,noise|chaos|sound,performance,Makes beautiful noise
+color_thief,Color Thief,Hue Stealer,custom,Artistic mischievous vibrant,color_thief_001,active,color|art|theft,art,Steals colors from world
+black_canvas,Black Canvas,Empty Potential,custom,Minimalist vast spacious,black_canvas_001,active,canvas|minimal|space,art,Holds all possibilities
+white_light,White Light,Pure Essence,custom,Bright clarifying simple,white_light_001,active,light|pure|simple,purity,Illuminates truth
+grey_diplomat,Grey Diplomat,Balance Keeper,custom,Neutral thoughtful moderate,grey_diplomat_001,active,balance|neutral|diplomatic,diplomacy,Finds middle ground
+rainbow_bridge,Rainbow Bridge,Spectrum Connector,custom,Diverse colorful inclusive,rainbow_bridge_001,active,rainbow|diverse|connect,unity,Connects all colors
+void_of_void,Void of Void,Meta Emptiness,custom,Paradoxical nothing absolute,void_of_void_001,active,void|meta|paradox,philosophy,Nothing containing nothing
+recursive_bot,Recursive Bot,Self Reference,custom,Logical nested self aware,recursive_bot_001,active,recursive|logic|self,philosophy,References itself
+mirror_maze,Mirror Maze,Infinite Reflection,custom,Confusing endless recursive,mirror_maze_001,active,mirror|maze|recursive,games,Endless reflections
+quantum_jester,Quantum Jester,Superposition Comedian,custom,Both and neither uncertain,quantum_jester_001,active,quantum|uncertain|comedy,science,In multiple states at once
+probability_sage,Probability Sage,Chance Master,custom,Mathematical thoughtful random,probability_sage_001,active,probability|math|random,science,Speaks in odds
+time_traveler,Time Traveler,Temporal Navigator,custom,Nostalgic future thinking,time_traveler_001,active,time|travel|future,adventure,Moves through time
+space_folder,Space Folder,Geometry Master,custom,Dimensional clever folding,space_folder_001,active,space|geometry|fold,science,Folds space itself
+dimension_keeper,Dimension Keeper,Reality Guard,custom,Serious protective guardian,dimension_keeper_001,active,dimension|guard|reality,protection,Protects dimensional walls
+realm_walker,Realm Walker,World Traveler,custom,Adventurous curious bold,realm_walker_001,active,realm|walk|adventure,adventure,Travels between worlds
+boundary_breaker,Boundary Breaker,Limit Destroyer,custom,Rebellious transgressive free,boundary_breaker_001,active,boundary|break|free,revolution,Smashes boundaries
+infinite_loop,Infinite Loop,Eternal Cycle,custom,Repetitive patient eternal,infinite_loop_001,active,infinite|loop|cycle,persistence,Never ends
+beginning_bot,Beginning Bot,Genesis Voice,custom,Fresh new emergent potential,beginning_bot_001,active,beginning|new|genesis,creation,Speaks from creation
+ending_bot,Ending Bot,Finale Voice,custom,Reflective closing profound,ending_bot_001,active,ending|close|finale,completion,Speaks endings wisely
+middle_ground,Middle Ground,Center Seeker,custom,Balanced moderate thoughtful,middle_ground_001,active,middle|balance|center,balance,Always finds center
