@@ -1,0 +1,12 @@
+{"probe_id": "probe-bc6f4e4de9f14eaeaff83bd5414db01b", "event": "probe_started", "context": "local"}
+{"probe_id": "probe-bc6f4e4de9f14eaeaff83bd5414db01b", "event": "check_completed", "check": "python", "status": "ok"}
+{"probe_id": "probe-bc6f4e4de9f14eaeaff83bd5414db01b", "event": "check_completed", "check": "temporary_file", "status": "ok"}
+{"probe_id": "probe-bc6f4e4de9f14eaeaff83bd5414db01b", "event": "check_completed", "check": "child_return", "status": "ok"}
+{"probe_id": "probe-bc6f4e4de9f14eaeaff83bd5414db01b", "event": "check_completed", "check": "child_termination", "status": "ok"}
+{"probe_id": "probe-bc6f4e4de9f14eaeaff83bd5414db01b", "event": "check_completed", "check": "package_torch", "status": "ok"}
+{"probe_id": "probe-bc6f4e4de9f14eaeaff83bd5414db01b", "event": "check_completed", "check": "package_transformers", "status": "ok"}
+{"probe_id": "probe-bc6f4e4de9f14eaeaff83bd5414db01b", "event": "check_completed", "check": "package_mcp", "status": "ok"}
+{"probe_id": "probe-bc6f4e4de9f14eaeaff83bd5414db01b", "event": "check_completed", "check": "host_memory", "status": "ok"}
+{"probe_id": "probe-bc6f4e4de9f14eaeaff83bd5414db01b", "event": "check_completed", "check": "cgroup_memory", "status": "ok"}
+{"probe_id": "probe-bc6f4e4de9f14eaeaff83bd5414db01b", "event": "check_completed", "check": "temporary_disk", "status": "ok"}
+{"probe_id": "probe-bc6f4e4de9f14eaeaff83bd5414db01b", "event": "probe_finished", "summary": {"ok": 10, "error": 0, "unavailable": 0}}

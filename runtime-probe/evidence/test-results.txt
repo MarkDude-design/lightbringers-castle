@@ -1,0 +1,12 @@
+test_denied_child_preserves_error (test_probe.ProbeTests.test_denied_child_preserves_error) ... ok
+test_deployment_plan_rejects_mutable_revision_and_credential_url (test_probe.ProbeTests.test_deployment_plan_rejects_mutable_revision_and_credential_url) ... ok
+test_failed_check_does_not_erase_other_results (test_probe.ProbeTests.test_failed_check_does_not_erase_other_results) ... ok
+test_missing_resource_is_null_and_unavailable (test_probe.ProbeTests.test_missing_resource_is_null_and_unavailable) ... ok
+test_package_discovery_does_not_import_target (test_probe.ProbeTests.test_package_discovery_does_not_import_target) ... ok
+test_real_child_output_and_termination (test_probe.ProbeTests.test_real_child_output_and_termination) ... ok
+test_real_file_roundtrip_and_cleanup (test_probe.ProbeTests.test_real_file_roundtrip_and_cleanup) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.348s
+
+OK

@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "probe_id": "probe-bc6f4e4de9f14eaeaff83bd5414db01b",
+  "context": "local",
+  "started_at": "2026-10-10T13:31:59.876206+00:00",
+  "checks": {
+    "python": {
+      "status": "ok",
+      "value": {
+        "version": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+        "implementation": "CPython",
+        "system": "Linux",
+        "release": "6.18.44",
+        "machine": "x86_64"
+      },
+      "error": null,
+      "elapsed_seconds": 0.000129
+    },
+    "temporary_file": {
+      "status": "ok",
+      "value": {
+        "created": true,
+        "write": true,
+        "read": true,
+        "delete": true,
+        "directory_removed": true,
+        "cleanup_error": null
+      },
+      "error": null,
+      "elapsed_seconds": 0.000371
+    },
+    "child_return": {
+      "status": "ok",
+      "value": {
+        "launched": true,
+        "output_received": true,
+        "stdout": "runtime-probe-child-ready\n",
+        "stderr": "",
+        "terminate_sent": false,
+        "kill_fallback": false,
+        "returncode": 0,
+        "reaped": true,
+        "cleanup_error": null
+      },
+      "error": null,
+      "elapsed_seconds": 0.013598
+    },
+    "child_termination": {
+      "status": "ok",
+      "value": {
+        "launched": true,
+        "output_received": true,
+        "stdout": "runtime-probe-child-ready\n",
+        "stderr": "",
+        "terminate_sent": true,
+        "kill_fallback": false,
+        "returncode": -15,
+        "reaped": true,
+        "cleanup_error": null
+      },
+      "error": null,
+      "elapsed_seconds": 0.101429
+    },
+    "package_torch": {
+      "status": "ok",
+      "value": {
+        "module_discoverable": false,
+        "distribution_version": null,
+        "import_tested": false,
+        "usable_for_inference": null
+      },
+      "error": null,
+      "elapsed_seconds": 0.000882
+    },
+    "package_transformers": {
+      "status": "ok",
+      "value": {
+        "module_discoverable": false,
+        "distribution_version": null,
+        "import_tested": false,
+        "usable_for_inference": null
+      },
+      "error": null,
+      "elapsed_seconds": 9.7e-05
+    },
+    "package_mcp": {
+      "status": "ok",
+      "value": {
+        "module_discoverable": false,
+        "distribution_version": null,
+        "import_tested": false,
+        "usable_for_inference": null
+      },
+      "error": null,
+      "elapsed_seconds": 6.6e-05
+    },
+    "host_memory": {
+      "status": "ok",
+      "value": {
+        "total_bytes": 10451464192,
+        "available_bytes": 9631670272,
+        "scope": "host-visible; not a container quota"
+      },
+      "error": null,
+      "elapsed_seconds": 0.000114
+    },
+    "cgroup_memory": {
+      "status": "ok",
+      "value": {
+        "limit_bytes": 8589934592,
+        "current_bytes": 3910971392,
+        "headroom_bytes": 4678963200,
+        "scope": "visible cgroup-v2 mount root; process membership not established"
+      },
+      "error": null,
+      "elapsed_seconds": 0.000124
+    },
+    "temporary_disk": {
+      "status": "ok",
+      "value": {
+        "total_bytes": 33770192896,
+        "used_bytes": 3450032128,
+        "free_bytes": 28585398272,
+        "scope": "temporary filesystem; persistence and per-user quota untested"
+      },
+      "error": null,
+      "elapsed_seconds": 2.7e-05
+    }
+  },
+  "finished_at": "2026-10-10T13:31:59.993270+00:00",
+  "summary": {
+    "ok": 10,
+    "error": 0,
+    "unavailable": 0
+  }
+}
