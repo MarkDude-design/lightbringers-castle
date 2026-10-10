@@ -1,0 +1,72 @@
+name: Runtime Probe Test
+
+on:
+  push:
+    branches:
+      - codex/mistral-runtime-probe
+    paths:
+      - 'runtime-probe/**'
+      - '.github/workflows/runtime-probe-test.yml'
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.12']
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: codex/mistral-runtime-probe
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        working-directory: runtime-probe
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.lock
+
+      - name: Run unit tests
+        working-directory: runtime-probe
+        run: |
+          python -m unittest discover -s tests -v
+
+      - name: Validate SDK offline
+        working-directory: runtime-probe
+        run: |
+          python verify_sdk.py
+
+      - name: Run runtime probe
+        working-directory: runtime-probe
+        run: |
+          set -o pipefail
+          python runtime_probe.py \
+            --probe-id probe-fc388f0ade0142b2b34255adcd7f3516 \
+            --output probe-result.json 2>&1 | tee probe-output.log
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtime-probe-artifacts
+          path: |
+            runtime-probe/probe-result.json
+            runtime-probe/probe-output.log
+          retention-days: 30
+
+      - name: Show output
+        if: always()
+        working-directory: runtime-probe
+        run: |
+          echo "=== probe-output.log ==="
+          cat probe-output.log || echo "No output log"
+          echo
+          echo "=== probe-result.json ==="
+          cat probe-result.json || echo "No result JSON"
