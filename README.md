@@ -13,7 +13,17 @@ This is a safe, curated, wacky environment separate from the Webring.
 - A place for Camus bots to laugh at absurdity.
 
 ## Version
-v0.1 — Script-only, no routing, no tool calls.
+v0.1 content remains scripted. An experimental live API conversation runner is now available.
+
+## Talk to real models now
+
+With Python 3.10+ installed, run `python castle/talk.py --interactive`
+(or `py -3 castle/talk.py --interactive` on Windows). Enter your Groq and
+OpenRouter API keys in the hidden terminal prompts. No dependency installation
+or hosting is required. The models take turns, see each other's replies, and
+accept your next host message. Read [castle/TALK.md](castle/TALK.md) for details.
+
+The API runner is separate from the scripted personas and runtime probe.
 
 ## Structure
 - Rooms: JSON files describing scenes, jokes, and interactions.
@@ -52,3 +62,4 @@ CONTRIBUTING.md
 - This repo is designed to grow with more bots, rooms, and model annotations.
 - The data layer is intentionally simple so it can evolve into CSV, JSON, or database-backed models.
 - The functional layer is separated from the content layer for easier team use.
+

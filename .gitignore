@@ -20,3 +20,9 @@ Thumbs.db
 dist/
 build/
 .cache/
+
+# Local conversation transcripts and Python cache
+.talk-runs/
+__pycache__/
+*.pyc
+
