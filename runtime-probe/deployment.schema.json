@@ -1,0 +1,245 @@
+{
+  "$defs": {
+    "DeploymentK8sBackendSpec": {
+      "description": "Worker configuration for the Kubernetes backend.",
+      "properties": {
+        "type": {
+          "const": "kubernetes",
+          "default": "kubernetes",
+          "title": "Type",
+          "type": "string"
+        },
+        "entrypoint": {
+          "$ref": "#/$defs/OptionalNullable_str_",
+          "default": "~?~unset~?~sentinel~?~"
+        },
+        "working_dir": {
+          "$ref": "#/$defs/OptionalNullable_str_",
+          "default": "~?~unset~?~sentinel~?~"
+        }
+      },
+      "title": "DeploymentK8sBackendSpec",
+      "type": "object"
+    },
+    "DeploymentKoyebBackendSpec": {
+      "description": "Worker configuration for the Koyeb backend.",
+      "properties": {
+        "type": {
+          "const": "koyeb",
+          "default": "koyeb",
+          "title": "Type",
+          "type": "string"
+        },
+        "build_directory": {
+          "$ref": "#/$defs/OptionalNullable_str_",
+          "default": "~?~unset~?~sentinel~?~"
+        },
+        "dockerfile_path": {
+          "$ref": "#/$defs/OptionalNullable_str_",
+          "default": "~?~unset~?~sentinel~?~"
+        }
+      },
+      "title": "DeploymentKoyebBackendSpec",
+      "type": "object"
+    },
+    "DeploymentResourceConfig": {
+      "properties": {
+        "replicas": {
+          "$ref": "#/$defs/OptionalNullable_int_",
+          "default": "~?~unset~?~sentinel~?~"
+        },
+        "cpu_request": {
+          "$ref": "#/$defs/OptionalNullable_str_",
+          "default": "~?~unset~?~sentinel~?~"
+        },
+        "cpu_limit": {
+          "$ref": "#/$defs/OptionalNullable_str_",
+          "default": "~?~unset~?~sentinel~?~"
+        },
+        "memory_request": {
+          "$ref": "#/$defs/OptionalNullable_str_",
+          "default": "~?~unset~?~sentinel~?~"
+        },
+        "memory_limit": {
+          "$ref": "#/$defs/OptionalNullable_str_",
+          "default": "~?~unset~?~sentinel~?~"
+        }
+      },
+      "title": "DeploymentResourceConfig",
+      "type": "object"
+    },
+    "DeploymentWorkerSpecInput": {
+      "properties": {
+        "github_url": {
+          "title": "Github Url",
+          "type": "string"
+        },
+        "revision": {
+          "$ref": "#/$defs/OptionalNullable_str_",
+          "default": "~?~unset~?~sentinel~?~"
+        },
+        "backend_spec": {
+          "$ref": "#/$defs/OptionalNullable_Annotated_Union_DeploymentKoyebBackendSpec__DeploymentK8sBackendSpec___FieldInfo_annotation_NoneType__required_True__discriminator__type____",
+          "default": "~?~unset~?~sentinel~?~"
+        },
+        "entrypoint": {
+          "$ref": "#/$defs/OptionalNullable_str_",
+          "default": "~?~unset~?~sentinel~?~",
+          "deprecated": true
+        },
+        "working_dir": {
+          "$ref": "#/$defs/OptionalNullable_str_",
+          "default": "~?~unset~?~sentinel~?~",
+          "deprecated": true
+        }
+      },
+      "required": [
+        "github_url"
+      ],
+      "title": "DeploymentWorkerSpecInput",
+      "type": "object"
+    },
+    "Nullable_Annotated_Union_DeploymentKoyebBackendSpec__DeploymentK8sBackendSpec___FieldInfo_annotation_NoneType__required_True__discriminator__type____": {
+      "anyOf": [
+        {
+          "discriminator": {
+            "mapping": {
+              "koyeb": "#/$defs/DeploymentKoyebBackendSpec",
+              "kubernetes": "#/$defs/DeploymentK8sBackendSpec"
+            },
+            "propertyName": "type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/DeploymentKoyebBackendSpec"
+            },
+            {
+              "$ref": "#/$defs/DeploymentK8sBackendSpec"
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Nullable_DeploymentResourceConfig_": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DeploymentResourceConfig"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Nullable_int_": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Nullable_str_": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "OptionalNullable_Annotated_Union_DeploymentKoyebBackendSpec__DeploymentK8sBackendSpec___FieldInfo_annotation_NoneType__required_True__discriminator__type____": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Nullable_Annotated_Union_DeploymentKoyebBackendSpec__DeploymentK8sBackendSpec___FieldInfo_annotation_NoneType__required_True__discriminator__type____"
+        },
+        {
+          "$ref": "#/$defs/Unset"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "OptionalNullable_DeploymentResourceConfig_": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Nullable_DeploymentResourceConfig_"
+        },
+        {
+          "$ref": "#/$defs/Unset"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "OptionalNullable_int_": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Nullable_int_"
+        },
+        {
+          "$ref": "#/$defs/Unset"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "OptionalNullable_str_": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Nullable_str_"
+        },
+        {
+          "$ref": "#/$defs/Unset"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Unset": {
+      "properties": {},
+      "title": "Unset",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "spec": {
+      "$ref": "#/$defs/DeploymentWorkerSpecInput"
+    },
+    "resources": {
+      "$ref": "#/$defs/OptionalNullable_DeploymentResourceConfig_",
+      "default": "~?~unset~?~sentinel~?~"
+    },
+    "hardened": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": false,
+      "title": "Hardened"
+    }
+  },
+  "required": [
+    "name",
+    "spec"
+  ],
+  "title": "CreateDeploymentRequest",
+  "type": "object"
+}

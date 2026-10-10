@@ -1,0 +1,34 @@
+{
+  "status": "pending_review_and_commit_selection",
+  "deployed": false,
+  "schema_basis": "mistralai 2.10.1 CreateDeploymentRequest and WorkflowExecutionRequest; method signatures validated offline",
+  "mcp_tool_schema_verified": false,
+  "proposed_sdk_method": "client.workflows.deployments.create_deployment",
+  "proposed_arguments_not_yet_callable": {
+    "name": "historical-runtime-probe",
+    "spec": {
+      "github_url": "https://github.com/MarkDude-design/lightbringers-castle",
+      "revision": null,
+      "backend_spec": {
+        "type": "koyeb",
+        "build_directory": "runtime-probe",
+        "dockerfile_path": "Dockerfile"
+      }
+    }
+  },
+  "workflow_identifier": "historical-runtime-probe-v1",
+  "missing": [
+    "Full immutable commit SHA containing the probe files",
+    "Mistral GitHub App repository access and selected workspace access",
+    "Deployment name availability and managed-deployment entitlement",
+    "Human deployment approval"
+  ],
+  "generate_resolved_arguments_with": "python prepare_deployment.py --repo https://github.com/MarkDude-design/lightbringers-castle --sha ACTUAL_FULL_COMMIT_SHA --build-directory runtime-probe",
+  "local_validation": "7 tests passed; 10 probe checks completed; SDK import, workflow definition and request schemas passed",
+  "not_validated": [
+    "Docker build",
+    "managed worker startup",
+    "managed execution",
+    "remote log retrieval"
+  ]
+}

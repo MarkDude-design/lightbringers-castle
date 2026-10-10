@@ -1,0 +1,180 @@
+{
+  "$defs": {
+    "Nullable_Any_": {},
+    "Nullable_Dict_str__Any__": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Nullable_Dict_str__str__": {
+      "anyOf": [
+        {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Nullable_float_": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Nullable_str_": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "OptionalNullable_Any_": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Nullable_Any_"
+        },
+        {
+          "$ref": "#/$defs/Unset"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "OptionalNullable_Dict_str__Any__": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Nullable_Dict_str__Any__"
+        },
+        {
+          "$ref": "#/$defs/Unset"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "OptionalNullable_Dict_str__str__": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Nullable_Dict_str__str__"
+        },
+        {
+          "$ref": "#/$defs/Unset"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "OptionalNullable_float_": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Nullable_float_"
+        },
+        {
+          "$ref": "#/$defs/Unset"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "OptionalNullable_str_": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Nullable_str_"
+        },
+        {
+          "$ref": "#/$defs/Unset"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Unset": {
+      "properties": {},
+      "title": "Unset",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "execution_id": {
+      "$ref": "#/$defs/OptionalNullable_str_",
+      "default": "~?~unset~?~sentinel~?~"
+    },
+    "input": {
+      "$ref": "#/$defs/OptionalNullable_Any_",
+      "default": "~?~unset~?~sentinel~?~"
+    },
+    "wait_for_result": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": false,
+      "title": "Wait For Result"
+    },
+    "timeout_seconds": {
+      "$ref": "#/$defs/OptionalNullable_float_",
+      "default": "~?~unset~?~sentinel~?~"
+    },
+    "custom_tracing_attributes": {
+      "$ref": "#/$defs/OptionalNullable_Dict_str__str__",
+      "default": "~?~unset~?~sentinel~?~"
+    },
+    "force_new_trace": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": false,
+      "title": "Force New Trace"
+    },
+    "traceparent": {
+      "$ref": "#/$defs/OptionalNullable_str_",
+      "default": "~?~unset~?~sentinel~?~"
+    },
+    "extensions": {
+      "$ref": "#/$defs/OptionalNullable_Dict_str__Any__",
+      "default": "~?~unset~?~sentinel~?~"
+    },
+    "task_queue": {
+      "$ref": "#/$defs/OptionalNullable_str_",
+      "default": "~?~unset~?~sentinel~?~",
+      "deprecated": true
+    },
+    "deployment_name": {
+      "$ref": "#/$defs/OptionalNullable_str_",
+      "default": "~?~unset~?~sentinel~?~"
+    }
+  },
+  "title": "WorkflowExecutionRequest",
+  "type": "object"
+}
