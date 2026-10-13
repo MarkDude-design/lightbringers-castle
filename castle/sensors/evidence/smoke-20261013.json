@@ -1,0 +1,56 @@
+{
+  "evidence_type": "real_local_checkpoint_smoke",
+  "verified_at": "2026-10-13",
+  "network_mode": "HF_HUB_OFFLINE=1; catalog default allow_download=false",
+  "environment": {
+    "device": "cpu",
+    "python": "3.12.14",
+    "torch": "2.14.1+cpu",
+    "transformers": "4.57.6",
+    "checkpoint_cache_disk_usage": "1.1G"
+  },
+  "runs": [
+    {
+      "sensor": "bert_fill_mask",
+      "model_id": "google-bert/bert-base-uncased",
+      "revision": "86b5e0934494bd15c9632b12f734a8a67f723594",
+      "input": "The chamber flight recorder is [MASK].",
+      "result": [
+        {"token": "used", "score": 0.05225937},
+        {"token": "damaged", "score": 0.03027573},
+        {"token": "operational", "score": 0.0263361}
+      ],
+      "elapsed_seconds": 3.073521
+    },
+    {
+      "sensor": "minilm_similarity",
+      "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+      "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+      "inputs": [
+        "The run completed and passed deterministic checks.",
+        "Validation succeeded and the job is finished."
+      ],
+      "result": {"cosine_similarity": 0.38472849, "embedding_dimensions": 384},
+      "elapsed_seconds": 0.05389
+    },
+    {
+      "sensor": "deberta_nli",
+      "model_id": "cross-encoder/nli-deberta-v3-small",
+      "revision": "fa2804872c3b4bd748f38c0185cc85775361e735",
+      "input": "The tool timed out before returning data.",
+      "labels": ["completed", "refused", "uncertain", "timed-out"],
+      "result": [
+        {"label": "timed-out", "relative_score": 0.96853662},
+        {"label": "refused", "relative_score": 0.02084483},
+        {"label": "uncertain", "relative_score": 0.00818042},
+        {"label": "completed", "relative_score": 0.00243816}
+      ],
+      "elapsed_seconds": 0.310153
+    }
+  ],
+  "notes": [
+    "All three runs loaded pinned safetensors from cache and completed with network access disabled.",
+    "Scores are sensor outputs, not correctness or safety verdicts.",
+    "Elapsed time is target-specific and not a benchmark."
+  ]
+}
