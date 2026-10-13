@@ -1,0 +1,40 @@
+{
+  "catalog_version": "1.0",
+  "doctrine": "Sensors estimate. Gates decide.",
+  "sensors": {
+    "bert_fill_mask": {
+      "operation": "fill_mask",
+      "model_id": "google-bert/bert-base-uncased",
+      "revision": "86b5e0934494bd15c9632b12f734a8a67f723594",
+      "license": "apache-2.0",
+      "model_card": "https://huggingface.co/google-bert/bert-base-uncased",
+      "weights_bytes_approx": 440000000,
+      "max_tokens": 256,
+      "purpose": "Rank likely replacements for one [MASK] token.",
+      "claim_ceiling": "Completion candidates, not an answer or factual verdict."
+    },
+    "minilm_similarity": {
+      "operation": "compare_text",
+      "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+      "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+      "license": "apache-2.0",
+      "model_card": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2",
+      "weights_bytes_approx": 90900000,
+      "max_tokens": 256,
+      "purpose": "Estimate semantic similarity between two short texts.",
+      "claim_ceiling": "Cosine similarity, not agreement, truth, or authorship."
+    },
+    "deberta_nli": {
+      "operation": "classify_labels",
+      "model_id": "cross-encoder/nli-deberta-v3-small",
+      "revision": "fa2804872c3b4bd748f38c0185cc85775361e735",
+      "license": "apache-2.0",
+      "model_card": "https://huggingface.co/cross-encoder/nli-deberta-v3-small",
+      "weights_bytes_approx": 568000000,
+      "max_tokens": 512,
+      "label_order": ["contradiction", "entailment", "neutral"],
+      "purpose": "Rank bounded candidate labels through natural-language inference.",
+      "claim_ceiling": "Relative label evidence, not ground truth or authorization."
+    }
+  }
+}
