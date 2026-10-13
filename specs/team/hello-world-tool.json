@@ -1,0 +1,57 @@
+{
+  "name": "hello_world",
+  "title": "Hello World ACK",
+  "description": "Return a deterministic acknowledgement for a host-generated challenge. Read-only and side-effect free.",
+  "inputSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "phrase": {
+        "const": "Hello World"
+      },
+      "nonce": {
+        "type": "string",
+        "minLength": 16,
+        "maxLength": 64,
+        "pattern": "^[A-Za-z0-9_-]+$"
+      }
+    },
+    "required": ["phrase", "nonce"],
+    "additionalProperties": false
+  },
+  "outputSchema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "echo": {
+        "const": "Hello World"
+      },
+      "nonce": {
+        "type": "string",
+        "minLength": 16,
+        "maxLength": 64,
+        "pattern": "^[A-Za-z0-9_-]+$"
+      },
+      "ack": {
+        "type": "object",
+        "properties": {
+          "code": {"const": "0xA"},
+          "state": {"const": "ACK_VERIFIED"}
+        },
+        "required": ["code", "state"],
+        "additionalProperties": false
+      },
+      "schema_version": {
+        "const": "1"
+      }
+    },
+    "required": ["echo", "nonce", "ack", "schema_version"],
+    "additionalProperties": false
+  },
+  "annotations": {
+    "readOnlyHint": true,
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "openWorldHint": false
+  }
+}

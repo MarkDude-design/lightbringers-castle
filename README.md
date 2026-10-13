@@ -31,6 +31,8 @@ The API runner is separate from the scripted personas and runtime probe.
 - Scripts: JS files for mapping jokes, personalities, and overlays.
 - Assets: optional images/audio for later versions.
 - Registry: CSV and JSON lookups for scaling to 100+ bots and rooms.
+- Team bus spec: `docs/OPENROUTER_MCP_TEAM_SPEC.md` defines the OpenRouter/MCP Hello/ACK probe, model fallback, digest workflow, and T3 integration boundary.
+- Team schemas: `specs/team/` contains the committed Hello/ACK, packet, digest, Z-review, and model-capability contracts.
 
 ## Next Versions
 v0.2 — Popup email, floating helper, Q page link
