@@ -32,10 +32,41 @@ For a single automatic conversation:
 python castle/talk.py --prompt "The castle hired an AI chef. What went wrong at breakfast?"
 ```
 
+## Read a real Castle room with OpenRouter
+
+Tool mode is deliberately opt-in and OpenRouter-only. It exposes one local,
+read-only function: `read_room`. The model receives an enum of the JSON files
+under `castle/rooms/`; it cannot supply a filesystem path, URL, Python, shell,
+or write operation. The first tool-enabled request requires `read_room`, then
+the client executes it locally and sends the structured result back to the same
+named model for a final answer.
+
+Run one acceptance transaction from the repository root:
+
+```sh
+python castle/talk.py --room-tools --rounds 1 --openrouter-model nvidia/nemotron-3.5-lightning:free --prompt "Use read_room to inspect the courtyard. Tell me its name and one detail that is actually stored there."
+```
+
+On Windows, substitute `py -3` for `python` if needed. Press Enter at the Groq
+key prompt to skip it, then enter the OpenRouter key using the hidden prompt.
+The example model appeared in OpenRouter's public model catalog with `tools`
+support on 2026-10-13. Free availability changes; if it disappears, choose a
+named `:free` model from:
+https://openrouter.ai/models?supported_parameters=tools
+
+`openrouter/free` is rejected in room-tool mode. Its underlying model may
+change between the tool request and continuation, which would make the receipt
+ambiguous. A successful JSONL receipt contains two separately counted API
+calls, a `tool_executed` event with the actual room envelope and tool-call ID,
+the returned model and inference IDs when supplied, and the final answer.
+Every continuation repeats the tool schema, and the whole process retains the
+existing 12-call cap plus a separate four-tool-execution cap.
+
 Defaults: Groq `openai/gpt-oss-20b`, OpenRouter `openrouter/free`, two rounds,
 up to 1,024 completion tokens per call, no retries, at most 12 calls per process.
 There is a 45-second socket timeout and a 1 MiB response-size limit. These are
-API replies, not local model downloads. No model tool execution is enabled.
+API replies, not local model downloads. Local tool execution is disabled unless
+`--room-tools` is supplied.
 
 OpenRouter's free router can choose a different underlying model each turn.
 The console and JSONL record the returned model ID separately from the
@@ -61,7 +92,7 @@ API model as BERT, GPT-2, Meraki or another named historical/persona slot.
 
 ## What is actually verified
 
-The provider protocol and error/provenance behavior are covered by offline
+The provider protocol, tool loop and error/provenance behavior are covered by offline
 fixture tests (`python -m unittest discover -s tests -p 'test_talk.py' -v`).
 Fixture text is not evidence of model execution. No live account call was run
 when this feature was authored: neither API key was available to the authoring
@@ -70,12 +101,13 @@ session. Your first terminal run supplies that missing live evidence.
 The runtime-probe GitHub Actions run succeeded on the probe branch, but it
 does not call a model. This runner supplies the missing API connection.
 
-## Provider references checked 2026-10-10
+## Provider references checked 2026-10-13
 
 - https://console.groq.com/docs/models
 - https://console.groq.com/docs/api-reference
 - https://console.groq.com/docs/rate-limits
 - https://openrouter.ai/docs/guides/routing/routers/free-router
+- https://openrouter.ai/docs/guides/features/tool-calling
 - https://openrouter.ai/pricing
 
 Free availability and limits can change. OpenRouter advertises 50 requests/day

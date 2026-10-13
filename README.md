@@ -24,6 +24,9 @@ or hosting is required. The models take turns, see each other's replies, and
 accept your next host message. Read [castle/TALK.md](castle/TALK.md) for details.
 
 The API runner is separate from the scripted personas and runtime probe.
+It also has an opt-in OpenRouter `read_room` tool that returns actual room JSON
+through a bounded, read-only client-side tool loop. The exact one-command test
+and receipt format are documented in [castle/TALK.md](castle/TALK.md).
 
 ## Structure
 - Rooms: JSON files describing scenes, jokes, and interactions.
