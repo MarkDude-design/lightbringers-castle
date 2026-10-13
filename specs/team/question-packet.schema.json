@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lightbringers.example/specs/team/question-packet.schema.json",
+  "title": "Castle Team Question Packet",
+  "type": "object",
+  "properties": {
+    "schema_version": {"const": "team-question-packet/0.1"},
+    "packet_id": {"type": "string", "pattern": "^[A-Za-z0-9._-]{1,96}$"},
+    "track": {"type": "string", "enum": ["talks", "castle", "chamber", "puppy-space", "openrouter", "research", "other"]},
+    "created_at": {"type": "string", "format": "date-time"},
+    "source_manifest": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "properties": {
+          "source_id": {"type": "string", "pattern": "^[A-Za-z0-9._-]{1,96}$"},
+          "kind": {"type": "string", "enum": ["file", "thread", "url", "note", "artifact"]},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "byte_length": {"type": "integer", "minimum": 0}
+        },
+        "required": ["source_id", "kind", "sha256", "byte_length"],
+        "additionalProperties": false
+      }
+    },
+    "hard_boundaries": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {"type": "string", "minLength": 1, "maxLength": 1000}
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "question_count": {"type": "integer", "minimum": 20, "maximum": 40},
+        "answer_max_chars": {"const": 512},
+        "evidence_refs_max": {"const": 6},
+        "unknown_allowed": {"const": true}
+      },
+      "required": ["question_count", "answer_max_chars", "evidence_refs_max", "unknown_allowed"],
+      "additionalProperties": false
+    },
+    "questions": {
+      "type": "array",
+      "minItems": 20,
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "properties": {
+          "question_id": {"type": "string", "pattern": "^Q[0-9]{3}$"},
+          "text": {"type": "string", "minLength": 1, "maxLength": 1000},
+          "tags": {
+            "type": "array",
+            "maxItems": 12,
+            "items": {"type": "string", "minLength": 1, "maxLength": 64}
+          },
+          "required": {"type": "boolean"},
+          "answer_kind": {"type": "string", "enum": ["fact", "choice", "risk", "next_step", "interpretation"]}
+        },
+        "required": ["question_id", "text", "tags", "required", "answer_kind"],
+        "additionalProperties": false
+      }
+    },
+    "packet_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  },
+  "required": ["schema_version", "packet_id", "track", "created_at", "source_manifest", "hard_boundaries", "policy", "questions", "packet_sha256"],
+  "additionalProperties": false
+}
