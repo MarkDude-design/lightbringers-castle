@@ -105,7 +105,11 @@ def complete(provider, key, body):
         record['raw'] = native
         if not isinstance(native, dict):
             raise ValueError('Provider returned a non-object response')
-        record['returned_model'] = native.get('model')
+        returned_model = native.get('model')
+        if returned_model is not None and (not isinstance(returned_model, str)
+                                           or not returned_model.strip()):
+            raise ValueError('Provider returned malformed model identity')
+        record['returned_model'] = returned_model
         record['usage'] = native.get('usage')
         if native.get('error'):
             raise ValueError('Provider returned an error; see raw.error')
@@ -116,8 +120,16 @@ def complete(provider, key, body):
             raise ValueError('Provider returned no assistant message')
         text = message.get('content')
         tool_calls = message.get('tool_calls')
+        if tool_calls is not None and not isinstance(tool_calls, list):
+            raise ValueError('Provider returned malformed tool_calls; expected a list')
+        if message.get('role', 'assistant') != 'assistant':
+            raise ValueError('Provider returned a non-assistant message')
         has_text = isinstance(text, str) and bool(text.strip())
         has_tools = isinstance(tool_calls, list) and bool(tool_calls)
+        if has_tools and message.get('role') != 'assistant':
+            raise ValueError('Tool-call message requires role: assistant for continuation')
+        if has_tools and text is not None and not isinstance(text, str):
+            raise ValueError('Tool-call message content must be text or null')
         if not has_text and not has_tools:
             raise ValueError('No text or tool call returned; native response preserved')
         record.update(status='ok', text=text if has_text else None,
@@ -176,13 +188,15 @@ def run(args, keys):
     providers = [p for p in PROVIDERS if keys.get(p)]
     room_tool_mode = bool(getattr(args, 'room_tools', False))
     catalog = room_tools.tool_catalog() if room_tool_mode else None
-    print(f'\n{session_id}\nTranscript: {path}\nHost: {args.prompt}\n', flush=True)
+    clean_prompt, _ = redact(args.prompt, keys.values())
+    print(f'\n{session_id}\nTranscript: {path}\nHost: {clean_prompt}\n', flush=True)
     print(f'Ctrl+C stops. STOP file is checked between calls. Maximum {MAX_CALLS} calls.\n',
           flush=True)
     counts = {'ok': 0, 'error': 0, 'stopped': 0}
     replies = 0
     call_index = 0
     tool_executions = 0
+    seen_tool_call_ids = set()
     last_openrouter = None
     stop = False
     with path.open('x', encoding='utf-8') as log:
@@ -199,21 +213,24 @@ def run(args, keys):
                'max_tool_executions': MAX_TOOL_EXECUTIONS if room_tool_mode else 0,
                'source_kind': 'live_api', 'historical_model': False})
 
-        def call_provider(provider, body, phase='reply'):
-            nonlocal call_index, last_openrouter, stop
-            if call_index >= MAX_CALLS:
-                return None
+        def stopped():
+            nonlocal stop
+            if stop:
+                return True
             if args.stop_file.exists():
                 stop = True
                 write({'event': 'session_stopped', 'session_id': session_id,
                        'reason': 'STOP file present', 'at': now()})
+                return True
+            return False
+
+        def call_provider(provider, body, phase='reply'):
+            nonlocal call_index, last_openrouter, stop
+            if stopped() or call_index >= MAX_CALLS:
                 return None
             if provider == 'openrouter' and last_openrouter is not None:
                 time.sleep(max(0, 4 - (time.monotonic() - last_openrouter)))
-            if args.stop_file.exists():
-                stop = True
-                write({'event': 'session_stopped', 'session_id': session_id,
-                       'reason': 'STOP file present', 'at': now()})
+            if stopped():
                 return None
             call_index += 1
             if provider == 'openrouter':
@@ -228,6 +245,8 @@ def run(args, keys):
                             'source_kind': 'live_api', 'historical_model': False,
                             'request': body, **result})
             counts[result['status']] += 1
+            if result['status'] == 'stopped':
+                stop = True
             return result
 
         try:
@@ -252,6 +271,9 @@ def run(args, keys):
                         native_messages = []
                         tool_failed = False
                         while result['status'] == 'ok' and result.get('tool_calls'):
+                            if stopped():
+                                tool_failed = True
+                                break
                             if not tool_enabled:
                                 counts['error'] += 1
                                 tool_failed = True
@@ -259,6 +281,18 @@ def run(args, keys):
                                        'at': now(), 'reason': 'Tools were not enabled'})
                                 break
                             calls = result['tool_calls']
+                            call_ids = [call.get('id') if isinstance(call, dict) else None
+                                        for call in calls]
+                            if (any(not isinstance(call_id, str) or not call_id.strip()
+                                    for call_id in call_ids)
+                                    or len(set(call_ids)) != len(call_ids)
+                                    or seen_tool_call_ids.intersection(call_ids)):
+                                counts['error'] += 1
+                                tool_failed = True
+                                write({'event': 'tool_loop_stopped', 'session_id': session_id,
+                                       'at': now(), 'call_index': call_index,
+                                       'reason': 'Invalid or repeated tool-call ID'})
+                                break
                             if tool_executions + len(calls) > MAX_TOOL_EXECUTIONS:
                                 counts['error'] += 1
                                 tool_failed = True
@@ -276,11 +310,19 @@ def run(args, keys):
                             messages.append(assistant_message)
                             native_messages.append(assistant_message)
                             for tool_call in calls:
+                                if stopped():
+                                    tool_failed = True
+                                    break
                                 execution = room_tools.execute_tool_call(tool_call)
                                 tool_executions += 1
+                                seen_tool_call_ids.add(execution['tool_call_id'])
                                 write({'event': 'tool_executed', 'session_id': session_id,
                                        'at': now(), 'provider': provider,
-                                       'requested_model': models[provider], **execution})
+                                       'requested_model': models[provider],
+                                       'returned_model': result.get('returned_model'),
+                                       'inference_id': result.get('inference_id'),
+                                       'call_index': call_index,
+                                       'source_kind': 'local_tool', **execution})
                                 if not execution['tool_call_id']:
                                     counts['error'] += 1
                                     tool_failed = True
@@ -309,6 +351,8 @@ def run(args, keys):
                                 break
                             if result.get('returned_model'):
                                 transaction_models.add(result['returned_model'])
+                            if len(transaction_models) > 1:
+                                break
                         if tool_enabled and len(transaction_models) > 1:
                             counts['error'] += 1
                             tool_failed = True

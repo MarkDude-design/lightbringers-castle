@@ -9,6 +9,15 @@ ROOMS_DIR = Path(__file__).resolve().parent / 'rooms'
 ROOM_ID = re.compile(r'^[a-z0-9_]+$')
 
 
+def unique_fields(pairs):
+    arguments = {}
+    for name, value in pairs:
+        if name in arguments:
+            raise ValueError('Duplicate tool argument field')
+        arguments[name] = value
+    return arguments
+
+
 def room_paths(rooms_dir=ROOMS_DIR):
     """Return the enumerated room registry as ``room_id -> JSON path``."""
     base = Path(rooms_dir).resolve()
@@ -99,8 +108,8 @@ def execute_tool_call(tool_call, rooms_dir=ROOMS_DIR):
                             'message': 'Tool arguments must be a JSON object string.'}}
     else:
         try:
-            arguments = json.loads(requested_arguments)
-        except json.JSONDecodeError:
+            arguments = json.loads(requested_arguments, object_pairs_hook=unique_fields)
+        except (ValueError, RecursionError):
             result = {'ok': False, 'data': None,
                       'error': {'code': 'invalid_json',
                                 'message': 'Tool arguments are not valid JSON.'}}

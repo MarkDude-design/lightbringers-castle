@@ -38,29 +38,63 @@ Tool mode is deliberately opt-in and OpenRouter-only. It exposes one local,
 read-only function: `read_room`. The model receives an enum of the JSON files
 under `castle/rooms/`; it cannot supply a filesystem path, URL, Python, shell,
 or write operation. The first tool-enabled request requires `read_room`, then
-the client executes it locally and sends the structured result back to the same
-named model for a final answer.
+the client executes it locally and requests the final answer using the same
+named model ID. Requested and returned IDs are recorded separately; provider
+identity is reported metadata, not a checkpoint attestation.
 
 Run one acceptance transaction from the repository root:
 
 ```sh
-python castle/talk.py --room-tools --rounds 1 --openrouter-model nvidia/nemotron-3.5-lightning:free --prompt "Use read_room to inspect the courtyard. Tell me its name and one detail that is actually stored there."
+python castle/talk.py --room-tools --rounds 1 --openrouter-model nvidia/nemotron-3.5-lightning:free --prompt "Use read_room to inspect the courtyard. After receiving the tool result, tell me the room's name and one detail actually stored there."
 ```
 
 On Windows, substitute `py -3` for `python` if needed. Press Enter at the Groq
 key prompt to skip it, then enter the OpenRouter key using the hidden prompt.
+For an OpenRouter-only receipt, GROQ_API_KEY must be unset in this terminal;
+otherwise its configured provider seat also runs. Never supply a key as a
+command-line argument. Run the reviewed code, not an older checkout.
 The example model appeared in OpenRouter's public model catalog with `tools`
-support on 2026-10-13. Free availability changes; if it disappears, choose a
+support on 2026-10-13; this review could not recheck the live catalog because
+network access returned HTTP 403. Free availability changes; if it disappears, choose a
 named `:free` model from:
 https://openrouter.ai/models?supported_parameters=tools
 
 `openrouter/free` is rejected in room-tool mode. Its underlying model may
 change between the tool request and continuation, which would make the receipt
-ambiguous. A successful JSONL receipt contains two separately counted API
+ambiguous. The smallest successful JSONL receipt contains two separately counted API
 calls, a `tool_executed` event with the actual room envelope and tool-call ID,
 the returned model and inference IDs when supplied, and the final answer.
 Every continuation repeats the tool schema, and the whole process retains the
 existing 12-call cap plus a separate four-tool-execution cap.
+Repeated reads with new IDs can use more than two calls, within those caps.
+Duplicate or reused tool-call IDs stop the transaction before re-execution.
+Malformed tool-call shapes are errors even if they accompany text. Invalid
+arguments or unregistered names yield structured tool errors, not room data.
+STOP is checked before each local tool execution and before API calls; it
+cannot interrupt a local read already underway or cancel a remote request.
+
+Exit zero alone is not a live acceptance receipt. Inspect the JSONL for the
+model-requested `read_room` call, matching `tool_call_id`, a successful local
+envelope equal to the stored courtyard JSON, and a subsequent answer that
+names the room and cites a real detail. A tools-only/null-content initial
+response is valid when followed by a successful local `read_room` result and
+a grounded final answer; no pre-tool introductory sentence is required.
+Confirm the requested model ID stays fixed and review returned identity using
+these states:
+
+- `exact`: requested and returned model IDs match, with consistent returned
+  identity across the transaction.
+- `alias_review`: requested and returned IDs differ as possible aliases;
+  human review is required, with no automatic alias equivalence assumed.
+- `unreported`: required model identity is missing; acceptance is incomplete.
+- `drift`: returned model identity changes within the transaction; acceptance
+  fails.
+
+These are JSONL acceptance review states, not changes to CLI exit semantics.
+Record inference IDs and usage when supplied,
+otherwise mark them unreported. Include every error or stop event; tool errors
+are recorded on `tool_executed`, while session `counts.error` also includes
+API and orchestration failures.
 
 Defaults: Groq `openai/gpt-oss-20b`, OpenRouter `openrouter/free`, two rounds,
 up to 1,024 completion tokens per call, no retries, at most 12 calls per process.
