@@ -140,11 +140,21 @@ Mark's merge decision and authorization for a new attempt are separate.
 The packet records task ID, goal, acceptance criteria, boundaries, current full
 Git base commit, allowed files, and the exact selected UTF-8 source contents.
 Each source has its repository-relative POSIX path, SHA-256 of original bytes,
-and byte length. Sources come from the working tree, so uncommitted edits can
+byte length, and (for newly frozen packets) `line_count`, calculated as
+`len(content.splitlines())` using the same convention as reference validation.
+`byte_length` is file size in bytes, never a citation boundary. Citations use
+1-based inclusive line ranges; an empty source has zero lines. Source content
+is stored once, without numbered copies or newline normalization, and its
+SHA-256 continues to cover the exact original file bytes.
+Sources come from the working tree, so uncommitted edits can
 be included: base commit is context, while source hashes define the actual
 evidence. Dry-run and run have the same packet hash if HEAD, inputs, and sources
 are unchanged. The packet is persisted once before inference and the reviewer
 receives that same content and hash, plus the validated worker artifact/hash.
+The added line metadata changes newly frozen packet hashes; historical packets
+and their hashes are not rewritten. Older saved packets without `line_count`
+remain readable and exportable. Validation continues to count lines directly
+from `content`, so an incorrect metadata count cannot permit an invalid citation.
 
 Input bounds:
 
@@ -183,6 +193,16 @@ The worker JSON has exactly these fields:
   "uncertainties": ["What cannot be established from supplied evidence."]
 }
 ```
+
+Every contract field, including nested fields, must be present. Both worker and
+reviewer must return `"uncertainties": []` when there are none. Missing fields
+are rejected, not filled automatically. Before proposing a repair, the worker
+must inspect existing handling and explain both what is already handled and
+the remaining concrete failure path in `problem`/`proposed_change`, with source
+references. An existence precheck alone does not fix a file disappearance race.
+If the supplied sources cannot establish a gap, state that uncertainty instead
+of inventing missing behavior. These are model instructions, not proof that a
+future output will be substantively correct.
 
 Allowed files must be a subset of the host's packet allowlist, which is itself
 a subset of the selected source paths in v0. References must resolve to supplied
