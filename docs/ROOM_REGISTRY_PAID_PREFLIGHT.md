@@ -1,6 +1,6 @@
 # First room-registry task: paid-model preflight
 
-Status: **blocked before inference**. Preparation checked current main at
+Status: **public metadata/pricing preflight passed; live execution not attempted**. Original preparation checked main at
 `2ee59ec13a8344f85960a87499f374b62237e379`, including PR #8's shared ledger-lock
 and canonical task-identity repairs. No runner or generated repair code changed.
 
@@ -24,11 +24,51 @@ The runner continues to send `response_format: {"type": "json_object"}`,
 No provider endpoint is pinned. No JSON/output validation, identity check,
 ledger check, STOP behavior, or accounting rule has been weakened.
 
-**Pricing is intentionally `{}`.** Missing prices remain null and dry-run/run
-fail closed. There is no current supported-endpoint set from which to compute
-an honest conservative price envelope. Do not substitute historical free-route
-costs, the cheapest paid endpoint, a guessed rate, or zero. The $0.05 budget is
-not a price estimate and does not establish that the task fits the budget.
+Pricing was initially missing because the original environment could not reach
+the metadata endpoint. That failure remains recorded below. A later public
+metadata read succeeded through the research connection, and the configuration
+now contains the component-wise conservative endpoint envelope documented here.
+Missing pricing still blocks spending; it has not been converted to zero.
+
+## Successful public metadata follow-through
+
+Observed at **2026-10-20T05:25:31.984934+00:00** from the official
+[model endpoint metadata](https://openrouter.ai/api/v1/models/openai/gpt-oss-20b/endpoints).
+The normalized observation is retained in
+[`evidence/gpt-oss-20b-endpoints-20261020.json`](evidence/gpt-oss-20b-endpoints-20261020.json).
+
+Nine endpoints advertise both `response_format` and `max_tokens`.
+OpenRouter's [parameter reference](https://openrouter.ai/docs/api/reference/parameters)
+defines `response_format: {"type":"json_object"}` as JSON mode; no narrower
+format restriction appears in the returned endpoint entries. Both Amazon
+Bedrock entries were excluded because they do not advertise `response_format`.
+
+| Eligible provider | Input USD / million tokens | Output USD / million tokens |
+|---|---:|---:|
+| Darkbloom | 0.018 | 0.09 |
+| AkashML | 0.02 | 0.10 |
+| DekaLLM | 0.029 | 0.14 |
+| CoreWeave | 0.03 | 0.13 |
+| DeepInfra | 0.03 | 0.14 |
+| Parasail | 0.03 | 0.15 |
+| SiliconFlow | 0.04 | 0.18 |
+| Google | 0.07 | 0.25 |
+| Groq | 0.075 | 0.30 |
+
+The component-wise maxima are **$0.075 input / $0.30 output per million
+tokens**. Prompt/completion fields were converted from USD per token. All
+advertised cache-read rates are at or below the corresponding prompt rate;
+discount fields are zero. No additional request-fee component appears in these
+returned pricing objects. This snapshot is not a guarantee against later rate,
+capability, routing, or billing changes. Provider-side key caps remain the
+backstop, and missing later usage still blocks further spending.
+
+The configuration's two-call byte-based estimate is **$0.0150969** with an
+empty local task ledger, below the authorized **$0.05** local task budget.
+That is a conservative local estimate, not an observed charge or live proof
+that the model will produce valid ticket/review outputs. No inference call,
+key lookup, account-cap lookup, or human acceptance was performed during this
+follow-through.
 
 ## Official metadata checks and eligibility
 
@@ -37,10 +77,11 @@ Read-only GET requests on October 19, 2026 PDT (October 20 UTC) targeted:
 - https://openrouter.ai/api/v1/models/openai/gpt-oss-20b/endpoints
 - https://openrouter.ai/api/v1/models/nvidia/nemotron-3.5-lightning:free/endpoints
 
-Both failed during proxy CONNECT with **HTTP 403 Forbidden**, before an
-OpenRouter endpoint response. No official endpoint capabilities or current
-rates were returned, so neither model was freshly qualified. Do not describe
-this network denial as model incompatibility or lack of account credits.
+In the original environment, both failed during proxy CONNECT with **HTTP 403
+Forbidden**, before an OpenRouter endpoint response. No capabilities or rates
+were returned there. The later successful paid-model metadata observation above
+supersedes that metadata-access blocker without erasing the original failure.
+Do not describe the proxy denial as model incompatibility or lack of credits.
 
 Before admission, retrieve current official endpoint metadata and retain its
 retrieval timestamp and source URL. Inspect the active endpoints' advertised
@@ -58,8 +99,8 @@ envelope, even if those maxima come from different providers. Record the
 eligible provider set, rates, source, and observation date. Consider any other
 advertised request/fee components: if they cannot be bounded honestly by the
 runner's existing two-rate estimate, keep preflight blocked rather than hide
-them. Missing eligibility or price data is not zero. No endpoint-price table
-is supplied here because none could be observed.
+them. Missing eligibility or price data is not zero. The observed table above
+supplies this check for the dated paid-model snapshot.
 
 Only after that check passes should the configuration's one pricing entry for
 `openai/gpt-oss-20b` be populated with `observed_on`, a source description naming
@@ -84,9 +125,10 @@ validation must not be weakened to turn it into a qualified transaction.
 
 ## Credential and local ledger checks
 
-This process has no `OPENROUTER_API_KEY` binding available through the runner's
-existing environment mechanism. No other credential route was tried, and no
-key was requested, printed, copied, or changed. Existing provider-side credit
+The original authoring process reported no `OPENROUTER_API_KEY` binding through
+the runner's existing environment mechanism. The later metadata follow-through
+did not inspect or transfer credentials and made no authenticated provider
+call. No other credential route was tried, and no key was requested, printed, copied, or changed. Existing provider-side credit
 caps are **unobservable here** without that approved credential; no account or
 key limit was inspected or changed. A previously discussed personal key/limit
 is not evidence of this process's current credential or spending backstop.
@@ -101,16 +143,18 @@ or deleted history to bypass prior costs or unresolved attempts.
 
 ## Offline preparation and conditional Windows command
 
-Dry-run uses the paid configuration and deliberately exits 1 with null
-estimates and `can_run: false` while prices are missing. It makes no provider
-request and does not prompt for credentials. The existing regression suites,
-Python compilation, JSON/JavaScript checks, CLI help, and diff checks are run
-before this preparation is handed back. No new feature or runner change is
+The original dry run correctly exited 1 with null estimates while prices were
+missing. After the successful metadata follow-through, the paid configuration's
+dry run passes against an empty local ledger with the estimate above. It makes
+no provider request and does not prompt for credentials. Independent offline verification of this follow-through passed: **70 tests**
+(63 conversation/project-task tests and seven runtime-probe tests), Python
+compilation, all **26 repository JSON files**, all **four JavaScript syntax
+checks**, CLI help, and `git diff --check`. No new feature or runner change is
 needed to represent missing pricing honestly.
 
-After official endpoint/pricing preflight has actually passed, dry-run confirms
-the estimate plus prior recorded task spending fits $0.05, and there is no
-uncertain ledger or active/stale lock, Mark can run this **once** from the
+The dated endpoint/pricing preflight above has passed. After Mark's local dry
+run confirms that estimate plus prior recorded task spending fits $0.05, and
+there is no uncertain ledger or active/stale lock, Mark can run this **once** from the
 prepared Git checkout on Windows, keeping its existing `.task-runs` history:
 
 ```powershell
@@ -119,8 +163,9 @@ py -3 castle/project_tasks.py run --config specs/tasks/room-registry-ticket-paid
 
 If a valid key is not already in the existing OpenRouter environment binding,
 the runner uses hidden terminal entry. Never put a key into the command, config,
-packet, note, source, chat, or logs. The command is not currently ready to spend:
-with this checked-in empty pricing map it stops before key entry/inference.
+packet, note, source, chat, or logs. The configuration now admits the dated
+estimate; actual execution still requires Mark's local ledger and secure key
+checks. A successful local dry run does not prove the credential or account cap.
 Do not rerun it after an uncertain, failed, timed-out, incomplete-accounting,
 or malformed-output attempt. Preserve the receipt and inspect the failed
 attempt, known charges, hashes, and account evidence before proposing any
@@ -135,6 +180,6 @@ estimate, run path, and the artifact-bound offline accept/reject commands.
 
 No worker or review artifact exists from this preparation. Consequently there
 is no Z export or accept/reject command tied to a real artifact yet. The next
-safe check is official endpoint metadata access and compatible conservative
-pricing, followed by secure local credential availability—not another model
-request or an invented live success receipt.
+safe step is Mark's local ledger dry run and secure credential/account-cap
+check using the qualified configuration. Preserve the one-attempt limit; do not
+invent a live success receipt or run a second copy in another environment.

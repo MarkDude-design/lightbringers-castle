@@ -27,5 +27,12 @@
   "budget_usd": "0.05",
   "allow_paid": true,
   "max_completion_tokens": 2048,
-  "pricing": {}
+  "pricing": {
+    "openai/gpt-oss-20b": {
+      "observed_on": "2026-10-20",
+      "source": "https://openrouter.ai/api/v1/models/openai/gpt-oss-20b/endpoints; component-wise maximum across nine endpoints advertising response_format/max_tokens; observation: docs/evidence/gpt-oss-20b-endpoints-20261020.json. Metadata preflight only, not live qualification.",
+      "input_usd_per_million": "0.075",
+      "output_usd_per_million": "0.3"
+    }
+  }
 }
