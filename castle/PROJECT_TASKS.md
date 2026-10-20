@@ -28,6 +28,13 @@ availability and structured-output compatibility are unverified for this feature
 The earlier room-tool live success is not a project-task live certification.
 The supplied pricing expires after seven days; do not refresh its date without
 refreshing the observation. A missing price is null and blocks spending.
+The original free example is not currently qualified for this runner's
+`response_format: {"type": "json_object"}` contract. Earlier room-tool success
+does not establish JSON response-format support, and current endpoint metadata
+could not be retrieved through this environment's proxy. This is missing
+qualification evidence, not a verified claim that the model lacks support.
+For the explicitly authorized paid-model preparation, see
+[room-registry paid preflight](../docs/ROOM_REGISTRY_PAID_PREFLIGHT.md).
 
 ## Configuration and budget
 
@@ -40,7 +47,8 @@ required request parameters must be honored. Requests contain no model tools.
 A model without `:free` requires `allow_paid: true` and a positive per-task
 `budget_usd`. Editing those host configuration fields is the explicit paid
 opt-in. **No paid or free project-task live transaction was run during this
-implementation. Do not run the paid acceptance transaction yet.**
+implementation. Live execution requires separate explicit authorization;
+configuration alone does not grant permission to spend.**
 
 There are at most two inference calls per attempt, worker then reviewer, each
 with 1..2048 completion tokens (example: 1200). STOP in the repository root is
