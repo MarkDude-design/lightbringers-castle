@@ -399,6 +399,134 @@ class ProjectTaskTests(unittest.TestCase):
         self.assertNotEqual(source['sha256'], self.packet['sources'][0]['sha256'])
         self.assertNotEqual(tasks.digest(frozen), tasks.digest(self.packet))
 
+    def test_line_counts_match_validator_without_normalizing_source_bytes(self):
+        cases = [(b'', 0), (b'one', 1), (b'one\n', 1), (b'one\n\n', 2),
+                 (b'one\r\ntwo\r\n', 2), ('\u03b1\u2028\u03b2\r\n\u03b3'.encode('utf-8'), 3)]
+        for raw, expected in cases:
+            with self.subTest(raw=raw):
+                path = self.repo / 'castle/example.py'
+                path.write_bytes(raw)
+                packet = self.freeze()
+                source = packet['sources'][0]
+                self.assertEqual(source['line_count'], expected)
+                self.assertEqual(source['content'], raw.decode('utf-8'))
+                self.assertEqual(source['byte_length'], len(raw))
+                self.assertEqual(source['sha256'], hashlib.sha256(raw).hexdigest())
+                self.assertEqual(path.read_bytes(), raw)
+                ref = {'path': source['path'], 'start_line': 1, 'end_line': expected}
+                if expected:
+                    tasks.validate_refs([ref], packet)
+                ref['end_line'] = expected + 1
+                with self.assertRaisesRegex(ValueError, 'line range'):
+                    tasks.validate_refs([ref], packet)
+
+    def test_both_roles_receive_required_field_and_line_unit_guidance_once(self):
+        result = self.run_task()
+        self.assertEqual(result['status'], 'reviewed')
+        self.assertEqual(len(self.requests), 2)
+        for request in self.requests:
+            system = request['messages'][0]['content']
+            self.assertIn('Every field in this contract, including nested fields, must be present', system)
+            self.assertIn('"uncertainties": []', system)
+            self.assertIn('1-based inclusive line ranges within line_count', system)
+            self.assertIn('str.splitlines()', system)
+            self.assertIn('byte_length is file size in bytes, never a citation boundary', system)
+            payload = json.loads(request['messages'][1]['content'])
+            self.assertEqual(payload['packet'], self.packet)
+            self.assertEqual(payload['packet_sha256'], tasks.digest(self.packet))
+            self.assertEqual(len(payload['packet']['sources']), 1)
+            source = payload['packet']['sources'][0]
+            self.assertEqual(set(source), {'path', 'sha256', 'byte_length', 'line_count', 'content'})
+            self.assertEqual(source['line_count'], 2)
+            # The packet holds one original content string, without numbered copies.
+            self.assertEqual(source['content'], (self.repo / source['path']).read_bytes().decode('utf-8'))
+            self.assertEqual(set(payload), {'packet', 'packet_sha256'} if request is self.requests[0]
+                             else {'packet', 'packet_sha256', 'worker', 'worker_sha256'})
+        worker_system = self.requests[0]['messages'][0]['content']
+        self.assertIn('check existing handling in the supplied sources', worker_system)
+        self.assertIn('remaining concrete failure path', worker_system)
+        self.assertIn('existence precheck alone does not fix a file disappearance race', worker_system)
+
+    def test_missing_uncertainties_is_rejected_in_both_roles_without_filling(self):
+        for role in ('worker', 'reviewer'):
+            with self.subTest(role=role):
+                self.config['task']['task_id'] = 'missing-uncertainties-' + role
+                self.packet = self.freeze()
+                self.requests.clear()
+                target_call = 1 if role == 'worker' else 2
+                def missing(*args):
+                    response = self.provider(*args)
+                    if len(self.requests) == target_call:
+                        value = json.loads(response['text'])
+                        del value['uncertainties']
+                        response['text'] = json.dumps(value)
+                        response['message']['content'] = response['text']
+                    return response
+                result = self.run_task(missing)
+                run, manifest, receipt = self.load(result)
+                self.assertEqual(result['status'], 'failed')
+                self.assertEqual(len(self.requests), target_call)
+                rejected = receipt['calls'][-1]['response']
+                self.assertNotIn('uncertainties', json.loads(rejected['text']))
+                self.assertEqual(rejected['raw']['message']['content'], rejected['text'])
+                self.assertNotIn('worker.json' if role == 'worker' else 'review.json', manifest['files'])
+                self.assertFalse((run / 'decision.json').exists())
+                self.assertTrue(result['report']['accounting_complete'])
+                self.assertEqual(result['report']['total_recorded_spend_usd'],
+                                 '0.001' if role == 'worker' else '0.002')
+                self.assertIsNone(receipt['reviewer_verdict'])
+                self.assertEqual(receipt['human_acceptance'], 'not_recorded')
+
+    def test_byte_length_citation_is_rejected_without_clipping_or_trusting_metadata(self):
+        # Synthetic source with the observed 125-line/4842-byte shape.
+        raw = b'x' * 4717 + b'\n' * 125
+        (self.repo / 'castle/example.py').write_bytes(raw)
+        self.packet = self.freeze()
+        source = self.packet['sources'][0]
+        self.assertEqual((source['line_count'], source['byte_length']), (125, 4842))
+        valid = self.ticket()
+        self.assertEqual(valid['uncertainties'], [])
+        valid['source_refs'][0]['end_line'] = 125
+        tasks.validate_output(valid, 'worker', self.packet)
+        forged = copy.deepcopy(self.packet)
+        forged['sources'][0]['line_count'] = 4842
+        ref = dict(valid['source_refs'][0], end_line=4842)
+        with self.assertRaisesRegex(ValueError, 'line range'):
+            tasks.validate_refs([ref], forged)
+        def byte_boundary(*args):
+            response = self.provider(*args)
+            value = json.loads(response['text'])
+            value['source_refs'][0]['end_line'] = 4842
+            response['text'] = json.dumps(value)
+            response['message']['content'] = response['text']
+            return response
+        result = self.run_task(byte_boundary)
+        _, manifest, receipt = self.load(result)
+        self.assertEqual(result['status'], 'failed')
+        self.assertEqual(len(self.requests), 1)
+        self.assertFalse(receipt['schema_valid'])
+        self.assertNotIn('worker.json', manifest['files'])
+        rejected = json.loads(receipt['calls'][0]['response']['text'])
+        self.assertEqual(rejected['source_refs'][0]['end_line'], 4842)
+        self.assertEqual(result['report']['total_recorded_spend_usd'], '0.001')
+        self.assertEqual((self.repo / 'castle/example.py').read_bytes(), raw)
+
+    def test_legacy_packet_without_line_count_still_validates_and_exports_unchanged(self):
+        self.packet = copy.deepcopy(self.packet)
+        del self.packet['sources'][0]['line_count']
+        expected_hash = tasks.digest(self.packet)
+        result = self.run_task()
+        run, _, _ = self.load(result)
+        self.assertEqual(result['status'], 'reviewed')
+        original = (run / 'packet.json').read_bytes()
+        with patch.object(tasks.talk, 'complete', side_effect=AssertionError('Offline export inferred')):
+            tasks.offline_operation(self.repo, result['run'], 'export-z')
+        bundle = json.loads((run / 'z-review-packet.json').read_text())
+        self.assertNotIn('line_count', bundle['packet']['sources'][0])
+        self.assertEqual(bundle['packet_sha256'], expected_hash)
+        self.assertEqual((run / 'packet.json').read_bytes(), original)
+        self.assertEqual(hashlib.sha256(original).hexdigest(), expected_hash)
+
     def test_path_boundaries_block_escape_secret_files_symlinks_and_sizes(self):
         outside = self.repo.parent / ('outside-' + self.repo.name + '.txt')
         outside.write_text('outside\n')
