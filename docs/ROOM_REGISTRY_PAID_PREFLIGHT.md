@@ -1,6 +1,8 @@
 # First room-registry task: paid-model preflight
 
-Status: **public metadata/pricing preflight passed; live execution not attempted**. Original preparation checked main at
+Status: **endpoint/pricing checks passed; paid execution blocked by available
+credit; no live attempt**. See the current follow-through below. Original
+preparation checked main at
 `2ee59ec13a8344f85960a87499f374b62237e379`, including PR #8's shared ledger-lock
 and canonical task-identity repairs. No runner or generated repair code changed.
 
@@ -9,6 +11,56 @@ $0.05 local task budget. This does not authorize retries, another attempt,
 automatic human acceptance, implementing the proposed ticket, merge, deployment,
 an account upgrade, or adding credits. No live attempt has started here; its
 authorization has not been used to send a request.
+
+## Current cloud follow-through — 2026-10-20 UTC
+
+After PRs #9 and #10 merged, this checkout was based on
+`127e257a418b958d018c9c1b56dc0d2a8e094539`. The platform reported the
+OpenRouter network-secret binding ready and its network policy enforced.
+Official paid/free endpoint metadata GETs now succeed; the prior proxy failure
+below is historical evidence, not the current access state.
+
+The [fresh public observation](evidence/room-registry-endpoint-preflight-20261020-followup.json)
+retains retrieval timestamps, original response hashes, supported parameters,
+endpoint statuses, and prices. Nine paid endpoints advertise `response_format`
+and `max_tokens` with sufficient completion capacity. Eight report status `0`;
+SiliconFlow reports `-2`. The conservative envelope still covers all nine,
+including the nonzero-status entry, so its exclusion is not used to lower the
+quote. Both Bedrock entries lack `response_format`. Rates remain **$0.075 input
+and $0.30 output per million tokens**, based on a fresh observation rather than
+a date-only refresh. No additional request-fee component appears in these
+returned pricing objects.
+This establishes advertised compatibility, not successful structured output.
+The fresh parameter-document page fetch was denied (HTTP 403); the earlier
+referenced JSON-mode contract was not newly reverified from that page.
+
+The original free model's sole advertised endpoint supports tools and
+`max_tokens`, but **does not advertise `response_format`**. It therefore does
+not currently qualify for this runner's enforced JSON-mode contract. The
+runner, model identity checks, provider fallback setting, and validators remain
+unchanged; a free-model substitution is not an authorized compatibility repair.
+
+Read-only authenticated key/balance preflight succeeded but found **no
+available prepaid credit**, blocking the paid task. A key's spending allowance
+is distinct from funded account balance; the **$0.05 local budget** is admission
+and accounting, not a guaranteed provider billing ceiling. Private selected
+balance/cap evidence is preserved outside Git with the handback. No credentials,
+private run artifacts, or raw account responses are committed. No credits were
+added, limits changed, or inference requests sent. The one-attempt authorization
+remains unused; no worker ticket, reviewer response, Z export, or human decision
+exists from this preflight.
+
+The original task ID and task content are preserved. The local ledger is empty,
+with complete accounting, zero accepted results, and no STOP or task lock. This
+observation does not replace any separate local history. Offline checks passed
+**87 tests** (74 conversation/project/verification tests and 13 runtime-probe
+tests), with no skips, plus compilation, tracked JSON, four JavaScript syntax
+checks, CLI help, and whitespace checks. The paid dry-run passes its local
+estimate; it does not query funding or grant spending permission. Resolve the
+funding prerequisite only through a separately authorized account decision,
+then repeat read-only preflight against the original preserved ledger before
+using the existing one-attempt command. Do not change task IDs or retry an
+uncertain attempt.
 
 ## Prepared configuration
 
@@ -117,13 +169,12 @@ The original configuration used `nvidia/nemotron-3.5-lightning:free` after a
 successful room-tool transaction. That transaction requested a tool call and
 grounded prose, not `response_format: {"type": "json_object"}`. Its zero cost
 and tool-call success do not qualify the project-task structured-response
-contract. Current free-model endpoint metadata was blocked as described above.
-We therefore have no fresh confirmation of compatible endpoints. This is an
-evidence gap, not an assertion that its endpoints definitively lack the
-parameter. The original free example is retained as historical material; its
+contract. Its metadata was blocked at the original preparation, but the current
+cloud follow-through above obtained it and found no advertised `response_format`
+support. The original free example is retained as historical material; its
 validation must not be weakened to turn it into a qualified transaction.
 
-## Credential and local ledger checks
+## Original credential and local ledger checks (historical)
 
 The original authoring process reported no `OPENROUTER_API_KEY` binding through
 the runner's existing environment mechanism. The later metadata follow-through
@@ -142,6 +193,10 @@ any local ledger; do not use a new task ID, new empty checkout, case alias,
 or deleted history to bypass prior costs or unresolved attempts.
 
 ## Offline preparation and conditional Windows command
+
+**Current paid execution is blocked by the funding prerequisite above.** The
+following command is a conditional handoff, not permission to bypass that gate.
+
 
 The original dry run correctly exited 1 with null estimates while prices were
 missing. After the successful metadata follow-through, the paid configuration's
@@ -179,7 +234,8 @@ requested/returned identities, generation IDs, reported usage/cost versus the
 estimate, run path, and the artifact-bound offline accept/reject commands.
 
 No worker or review artifact exists from this preparation. Consequently there
-is no Z export or accept/reject command tied to a real artifact yet. The next
-safe step is Mark's local ledger dry run and secure credential/account-cap
-check using the qualified configuration. Preserve the one-attempt limit; do not
-invent a live success receipt or run a second copy in another environment.
+is no Z export or accept/reject command tied to a real artifact yet. The
+historical next step was Mark's local ledger dry run and secure credential/cap
+check. The current follow-through supersedes that credential/access blocker
+and identifies the remaining funding blocker. Preserve the one-attempt limit;
+do not invent a live receipt or run a second copy in another environment.

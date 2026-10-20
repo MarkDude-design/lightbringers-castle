@@ -1,0 +1,401 @@
+{
+  "schema_version": "castle-endpoint-preflight-observation/0.1",
+  "retrieval": "Selected public endpoint metadata normalized from direct official HTTPS GETs; raw-response hashes retained. No inference request.",
+  "required_parameters": [
+    "response_format",
+    "max_tokens"
+  ],
+  "requested_response_format": {
+    "type": "json_object"
+  },
+  "max_completion_tokens_per_call": 2048,
+  "paid": {
+    "requested_model": "openai/gpt-oss-20b",
+    "source_url": "https://openrouter.ai/api/v1/models/openai/gpt-oss-20b/endpoints",
+    "observed_at_utc": "2026-10-20T20:21:35.080884+00:00",
+    "raw_response_sha256": "e3c992b0c0ca24ad6de631c3265ecd94754cf2f7cd38d4d4678f7d2a52ff4fa3",
+    "endpoints": [
+      {
+        "name": "Darkbloom | openai/gpt-oss-20b",
+        "provider_name": "Darkbloom",
+        "tag": "darkbloom/fp8",
+        "status": 0,
+        "context_length": 131072,
+        "max_completion_tokens": 32768,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "temperature",
+          "top_p",
+          "top_k",
+          "frequency_penalty",
+          "presence_penalty",
+          "repetition_penalty",
+          "stop",
+          "seed",
+          "max_tokens",
+          "response_format",
+          "structured_outputs",
+          "tools",
+          "tool_choice",
+          "logprobs",
+          "top_logprobs",
+          "reasoning_effort"
+        ],
+        "pricing": {
+          "prompt": "0.000000018",
+          "completion": "0.00000009",
+          "input_cache_read": "0.000000009",
+          "discount": 0
+        },
+        "advertised_contract_compatible": true
+      },
+      {
+        "name": "AkashML | openai/gpt-oss-20b",
+        "provider_name": "AkashML",
+        "tag": "akashml/fp4",
+        "status": 0,
+        "context_length": 131072,
+        "max_completion_tokens": 117964,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "temperature",
+          "top_p",
+          "top_k",
+          "stop",
+          "seed",
+          "frequency_penalty",
+          "presence_penalty",
+          "repetition_penalty",
+          "max_tokens",
+          "structured_outputs",
+          "response_format",
+          "tools",
+          "tool_choice",
+          "logprobs",
+          "top_logprobs",
+          "reasoning_effort"
+        ],
+        "pricing": {
+          "prompt": "0.00000002",
+          "completion": "0.0000001",
+          "discount": 0
+        },
+        "advertised_contract_compatible": true
+      },
+      {
+        "name": "DekaLLM | openai/gpt-oss-20b",
+        "provider_name": "DekaLLM",
+        "tag": "dekallm/bf16",
+        "status": 0,
+        "context_length": 131072,
+        "max_completion_tokens": 117964,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "frequency_penalty",
+          "logit_bias",
+          "max_tokens",
+          "presence_penalty",
+          "seed",
+          "stop",
+          "temperature",
+          "top_p",
+          "response_format",
+          "structured_outputs",
+          "tools",
+          "tool_choice",
+          "logprobs",
+          "top_logprobs",
+          "reasoning_effort"
+        ],
+        "pricing": {
+          "prompt": "0.000000029",
+          "completion": "0.00000014",
+          "input_cache_read": "0.000000029",
+          "discount": 0
+        },
+        "advertised_contract_compatible": true
+      },
+      {
+        "name": "CoreWeave | openai/gpt-oss-20b",
+        "provider_name": "CoreWeave",
+        "tag": "coreweave/fp4",
+        "status": 0,
+        "context_length": 131072,
+        "max_completion_tokens": 117964,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "structured_outputs",
+          "response_format",
+          "max_tokens",
+          "temperature",
+          "top_p",
+          "top_k",
+          "repetition_penalty",
+          "frequency_penalty",
+          "presence_penalty",
+          "stop",
+          "seed",
+          "tools",
+          "tool_choice",
+          "logprobs",
+          "top_logprobs",
+          "reasoning_effort"
+        ],
+        "pricing": {
+          "prompt": "0.00000003",
+          "completion": "0.00000013",
+          "input_cache_read": "0.00000003",
+          "discount": 0
+        },
+        "advertised_contract_compatible": true
+      },
+      {
+        "name": "DeepInfra | openai/gpt-oss-20b",
+        "provider_name": "DeepInfra",
+        "tag": "deepinfra/bf16",
+        "status": 0,
+        "context_length": 131072,
+        "max_completion_tokens": 117964,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "max_tokens",
+          "temperature",
+          "top_p",
+          "stop",
+          "frequency_penalty",
+          "presence_penalty",
+          "repetition_penalty",
+          "top_k",
+          "seed",
+          "min_p",
+          "tools",
+          "tool_choice",
+          "structured_outputs",
+          "logit_bias",
+          "response_format",
+          "reasoning_effort"
+        ],
+        "pricing": {
+          "prompt": "0.00000003",
+          "completion": "0.00000014",
+          "discount": 0
+        },
+        "advertised_contract_compatible": true
+      },
+      {
+        "name": "Parasail | openai/gpt-oss-20b",
+        "provider_name": "Parasail",
+        "tag": "parasail/fp4",
+        "status": 0,
+        "context_length": 131072,
+        "max_completion_tokens": 117964,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "max_tokens",
+          "temperature",
+          "top_p",
+          "frequency_penalty",
+          "presence_penalty",
+          "repetition_penalty",
+          "seed",
+          "stop",
+          "top_k",
+          "logit_bias",
+          "response_format",
+          "structured_outputs",
+          "tools",
+          "tool_choice",
+          "logprobs",
+          "top_logprobs",
+          "reasoning_effort"
+        ],
+        "pricing": {
+          "prompt": "0.00000003",
+          "completion": "0.00000015",
+          "input_cache_read": "0.00000002",
+          "discount": 0
+        },
+        "advertised_contract_compatible": true
+      },
+      {
+        "name": "SiliconFlow | openai/gpt-oss-20b",
+        "provider_name": "SiliconFlow",
+        "tag": "siliconflow/fp8",
+        "status": -2,
+        "context_length": 131072,
+        "max_completion_tokens": 8192,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "structured_outputs",
+          "response_format",
+          "temperature",
+          "top_p",
+          "top_k",
+          "frequency_penalty",
+          "max_tokens",
+          "reasoning_effort"
+        ],
+        "pricing": {
+          "prompt": "0.00000004",
+          "completion": "0.00000018",
+          "discount": 0
+        },
+        "advertised_contract_compatible": true
+      },
+      {
+        "name": "Amazon Bedrock | openai/gpt-oss-20b",
+        "provider_name": "Amazon Bedrock",
+        "tag": "amazon-bedrock/eu-west-1",
+        "status": 0,
+        "context_length": 131072,
+        "max_completion_tokens": 117964,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "max_tokens",
+          "temperature",
+          "top_p",
+          "top_k",
+          "stop",
+          "tools",
+          "tool_choice",
+          "reasoning_effort"
+        ],
+        "pricing": {
+          "prompt": "0.00000007",
+          "completion": "0.00000015",
+          "discount": 0
+        },
+        "advertised_contract_compatible": false
+      },
+      {
+        "name": "Amazon Bedrock | openai/gpt-oss-20b",
+        "provider_name": "Amazon Bedrock",
+        "tag": "amazon-bedrock",
+        "status": 0,
+        "context_length": 131072,
+        "max_completion_tokens": 117964,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "max_tokens",
+          "temperature",
+          "top_p",
+          "top_k",
+          "stop",
+          "tools",
+          "tool_choice",
+          "reasoning_effort"
+        ],
+        "pricing": {
+          "prompt": "0.00000007",
+          "completion": "0.00000015",
+          "discount": 0
+        },
+        "advertised_contract_compatible": false
+      },
+      {
+        "name": "Google | openai/gpt-oss-20b",
+        "provider_name": "Google",
+        "tag": "google-vertex/us-central1",
+        "status": 0,
+        "context_length": 131072,
+        "max_completion_tokens": 32768,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "structured_outputs",
+          "response_format",
+          "max_tokens",
+          "temperature",
+          "top_p",
+          "seed",
+          "repetition_penalty",
+          "top_k",
+          "reasoning_effort"
+        ],
+        "pricing": {
+          "prompt": "0.00000007",
+          "completion": "0.00000025",
+          "discount": 0
+        },
+        "advertised_contract_compatible": true
+      },
+      {
+        "name": "Groq | openai/gpt-oss-20b",
+        "provider_name": "Groq",
+        "tag": "groq",
+        "status": 0,
+        "context_length": 131072,
+        "max_completion_tokens": 65536,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "max_tokens",
+          "temperature",
+          "top_p",
+          "stop",
+          "seed",
+          "response_format",
+          "tools",
+          "tool_choice",
+          "structured_outputs",
+          "reasoning_effort"
+        ],
+        "pricing": {
+          "prompt": "0.000000075",
+          "completion": "0.0000003",
+          "input_cache_read": "0.0000000375",
+          "discount": 0
+        },
+        "advertised_contract_compatible": true
+      }
+    ]
+  },
+  "free": {
+    "requested_model": "nvidia/nemotron-3.5-lightning:free",
+    "source_url": "https://openrouter.ai/api/v1/models/nvidia/nemotron-3.5-lightning:free/endpoints",
+    "observed_at_utc": "2026-10-20T20:21:35.286007+00:00",
+    "raw_response_sha256": "c7248ad054735aa0d2f5319ae9191d0f479a57e05d9bb18b2f5df112a3e65fa4",
+    "endpoints": [
+      {
+        "name": "Nvidia | nvidia/nemotron-3.5-lightning-20260807:free",
+        "provider_name": "Nvidia",
+        "tag": "nvidia/nvfp4",
+        "status": 0,
+        "context_length": 1000000,
+        "max_completion_tokens": 65536,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "temperature",
+          "max_tokens",
+          "seed",
+          "top_p",
+          "tools",
+          "tool_choice"
+        ],
+        "pricing": {
+          "prompt": "0",
+          "completion": "0",
+          "discount": 0
+        },
+        "advertised_contract_compatible": false
+      }
+    ]
+  },
+  "pricing_envelope": {
+    "input_usd_per_million": "0.075",
+    "output_usd_per_million": "0.3",
+    "basis": "Component-wise maxima across all nine advertised-compatible endpoints, including SiliconFlow status -2. Eight compatible endpoints report status 0. The two Bedrock endpoints lack response_format and are excluded.",
+    "eligibility_limit": "Advertised response_format support, not a live provider guarantee. Metadata contains no narrower format restrictions. Existing OpenRouter JSON-mode parameter reference applies."
+  },
+  "live_inference_verified": false
+}

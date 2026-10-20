@@ -30,9 +30,10 @@ The supplied pricing expires after seven days; do not refresh its date without
 refreshing the observation. A missing price is null and blocks spending.
 The original free example is not currently qualified for this runner's
 `response_format: {"type": "json_object"}` contract. Earlier room-tool success
-does not establish JSON response-format support, and current endpoint metadata
-could not be retrieved through this environment's proxy. This is missing
-qualification evidence, not a verified claim that the model lacks support.
+does not establish JSON response-format support. The current official endpoint
+observation does not advertise `response_format` for that free model; it therefore
+does not qualify for this enforced request contract. See the dated evidence in
+the paid preflight below; advertised compatibility is not live acceptance.
 For the explicitly authorized paid-model preparation, see
 [room-registry paid preflight](../docs/ROOM_REGISTRY_PAID_PREFLIGHT.md).
 
