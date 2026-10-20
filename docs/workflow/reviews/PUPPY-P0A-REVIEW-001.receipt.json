@@ -1,0 +1,72 @@
+{
+  "schema_version": "work-receipt/0.1",
+  "task_id": "PUPPY-P0A-REVIEW-001",
+  "packet_sha256": "44800d2d9679324cb964c3aa1a4126fd8201beaeada4ee587bdf7c5d1697ccd0",
+  "build_packet_sha256": "bfd883d6ad82c2e4434d976e4a198f73c41bbed8fb3a401d194ed3a7c0115d1e",
+  "source_base_commit": "2e8a039a9a0ad2d7087cf32415dbbf0a99f26a37",
+  "model_requested": "gpt-6-luna",
+  "reasoning_requested": "low",
+  "model_observed": null,
+  "model_identity_source": "spawn request only; runtime model response metadata unavailable",
+  "parent_context": "none",
+  "started_at_utc": "2026-10-20T02:29:43.636419+00:00",
+  "finished_observed_at_utc": "2026-10-20T02:30:58.191630+00:00",
+  "elapsed_seconds": null,
+  "elapsed_note": "Exact subagent runtime unavailable; timestamps include parent observation delay.",
+  "human_minutes_self_reported": null,
+  "attempt_count": 1,
+  "repair_attempt_count": 0,
+  "input_manifest_at_dispatch": [
+    {
+      "path": "docs/workflow/packets/PUPPY-P0A-001.json",
+      "sha256": "bfd883d6ad82c2e4434d976e4a198f73c41bbed8fb3a401d194ed3a7c0115d1e",
+      "byte_length": 7136
+    },
+    {
+      "path": "docs/workflow/README.md",
+      "sha256": "9224b3953f679b040c4f8e34d0e6599f4ab6eebe55d04fd97ce816ca0eb1ea11",
+      "byte_length": 4839
+    },
+    {
+      "path": "docs/workflow/receipt-template.json",
+      "sha256": "99812c7bdfcf26dab288221e90b24b94c855982459acae0c3506a757afde3d0f",
+      "byte_length": 1053,
+      "preserved_original_path": "docs/workflow/reviews/inputs/receipt-template-v0.json"
+    }
+  ],
+  "output_manifest": [
+    {
+      "path": "docs/workflow/reviews/PUPPY-P0A-REVIEW-001.json",
+      "sha256": "fb8faddff1d0148b7956bd4dbdeff35c235ef6850664ada1e73cabd1eff74ac6",
+      "byte_length": 1631
+    }
+  ],
+  "usage": {
+    "source": "unavailable",
+    "input_tokens": null,
+    "cached_input_tokens": null,
+    "output_tokens": null,
+    "reasoning_tokens": null,
+    "cost_usd": null,
+    "cost_coverage": "unknown"
+  },
+  "agent_result": "NEEDS_REVISION",
+  "parent_assessment": {
+    "reviewer": "Meraki",
+    "hash_verified": true,
+    "findings": [
+      {
+        "finding": 1,
+        "disposition": "Expected assignment gate; preserve Z authority, not a defect to silently resolve."
+      },
+      {
+        "finding": 2,
+        "disposition": "Accepted wording clarification; template now uses source=unavailable and status=not_started. No build acceptance claimed."
+      }
+    ],
+    "review_acceptance_by_Z": "PENDING"
+  },
+  "accepted_build_count": 0,
+  "aggregate_cost_per_accepted_result_usd": null,
+  "stop_reason": "Bounded review delivered; no implementation or other agents spawned."
+}

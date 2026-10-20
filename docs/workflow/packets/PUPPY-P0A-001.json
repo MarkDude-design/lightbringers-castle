@@ -1,0 +1,84 @@
+{
+  "schema_version": "bounded-work-order/0.1",
+  "task_id": "PUPPY-P0A-001",
+  "packet_version": 1,
+  "track": "puppy-space",
+  "objective": "One offline x86-64 QEMU image boots a minimal shell and emits timestamped HELLO every 120 seconds; exercise a hashed delegation and evidence receipt around the single implementation worker.",
+  "source_base_commit": "2e8a039a9a0ad2d7087cf32415dbbf0a99f26a37",
+  "repository": "MarkDude-design/lightbringers-castle",
+  "authority": {
+    "coordinator_reviewer": "Z (Mistral Vibe)",
+    "assignment_tie_break": "Z",
+    "merge_gate": "Mark",
+    "implementation_worker_count": 1,
+    "worker_model": null,
+    "allocation_status": "pending Z assignment; cheap-GPT lanes are suggestions",
+    "max_total_cost_usd": null,
+    "spend_gate": "No new metered external API runs, paid services, or infrastructure until a numeric cap or existing-budget authorization is recorded by Z/Mark. Existing authorized subscription work may proceed with cost recorded as unavailable.",
+    "first_build_method": "Reuse pinned Buildroot, BusyBox, Linux kernel and compressed initramfs as the provisional existing proposal; record exact upstream versions/hashes. Stop for Z if another backend is needed."
+  },
+  "inputs": {
+    "worker_reads": [
+      "This packet plus its exact-byte SHA-256 companion",
+      "Repository checkout at source_base_commit; inspect CONTRIBUTING.md and any applicable AGENTS.md",
+      "Only the allowed build/test paths and relevant upstream primary documentation"
+    ],
+    "context_limit": "Do not read the full repository or archive to reconstruct design. Read only named inputs and necessary build sources; ask Z for a targeted excerpt if a blocking fact is missing.",
+    "not_given": [
+      "Full chat histories, prior model debates, or the 30 KB consolidated archive",
+      "Other agents' entire contexts or unrelated project documents",
+      "Workplace, client, medical, or union records",
+      "API credentials or an external-model budget",
+      "MCP/OpenRouter protocol as an offline boot requirement"
+    ],
+    "source_summary": "Consolidated P0 handoff read by Meraki in full; latest user direction controls. P0a is boot/heartbeat, P0b is correlated ACK, P0c is one laptop. Existing branch networked HELLO/ACK remains separate. No offline boot implementation found in inspected main/six branches; unavailable earlier specs must not be presumed nonexistent."
+  },
+  "allowed_changes": [
+    "puppy-p0a/**",
+    "docs/workflow/runs/PUPPY-P0A-001/**"
+  ],
+  "spec": {
+    "runtime": "RAM-first Linux kernel + compressed initramfs + static BusyBox + /init; no model or network dependency",
+    "host": "Linux build host; shell/Python test tooling allowed on host, not in runtime image",
+    "boot": "Direct kernel/initramfs QEMU boot is sufficient for P0a. EFI/USB/laptop boot is P0c, not claimed here.",
+    "shell": "Serial console accepts a shell command while heartbeat runs in background",
+    "clock": "Use guest monotonic uptime seconds; do not imply accurate wall-clock time without a clock source",
+    "hello_record": "HELLO seq=<positive-integer> uptime_s=<nonnegative-integer>",
+    "heartbeat_interval_s": 120,
+    "hello_sequence": "First HELLO within 15 guest uptime seconds of /init, seq=1; subsequent records increment exactly once per 120-second interval",
+    "size": "Target about 20 MB; practical 40–60 MB. Hard P0 ceiling: kernel+compressed initramfs combined strictly below 100000000 bytes. Measure build output size separately from runtime RAM; do not call this combined payload a full bootable ISO.",
+    "fedora": "Retain a Fedora development connection where practical; do not add Fedora runtime packages solely for branding or change ABI assumptions.",
+    "source_pinning": "Record exact source versions, archive digests, config, toolchain/host versions and build command. Do not claim bit-for-bit reproducibility until separately tested."
+  },
+  "acceptance": [
+    "Clean pinned build exits zero and emits real kernel/initramfs artifacts plus manifest; never substitute a host script for a guest boot.",
+    "Host launcher starts QEMU with -nic none, no shared folders, no host block devices, controlled serial capture, and fixed memory. Record command and timeout.",
+    "Observed boot reaches a serial shell within 90 host monotonic seconds on the recorded host. Send a fresh host-generated token through a shell printf command and require the exact output line, not the echoed command text.",
+    "Observe three actual HELLO records with seq 1,2,3; require first guest uptime <=15 and successive guest uptime intervals 115–125 seconds. Host arrival intervals must be 105–150 seconds; hard total timeout 390 seconds. No shortened production interval merely to pass tests.",
+    "Run with 128 MiB guest RAM and record pass/fail. This establishes a tested allocation, not minimum RAM or resident usage; record those as unknown unless measured.",
+    "Combined kernel/initramfs size <100000000 bytes; report each artifact byte count and SHA-256.",
+    "Host checker rejects fixtures for missing heartbeat, duplicate sequence, malformed timestamp, incorrect interval, absent shell response, and timeout. Fixture passes are not evidence of real boot.",
+    "Review final runtime configuration for no guest networking and no GUI/Python/model runtime. Preserve config evidence; -nic none alone is not a containment proof.",
+    "Receipt includes packet hash, source base, result commit/patch, model identity evidence or uncertainty, attempts, reviewer outcome, usage/cost evidence or explicit nulls, and artifact hashes."
+  ],
+  "required_outputs": [
+    "puppy-p0a/README.md with exact build and acceptance commands",
+    "puppy-p0a build config/scripts and guest /init",
+    "puppy-p0a host acceptance checker and meaningful failure fixtures",
+    "docs/workflow/runs/PUPPY-P0A-001/build-manifest.json",
+    "docs/workflow/runs/PUPPY-P0A-001/serial.log",
+    "docs/workflow/runs/PUPPY-P0A-001/test-results.json",
+    "docs/workflow/runs/PUPPY-P0A-001/receipt.json",
+    "Image artifacts retained with download location and hashes; no large binaries committed without a named storage decision",
+    "Preserved task branch/commit and draft PR; no merge"
+  ],
+  "stopping_condition": "Stop after acceptance evidence is complete and preserved for Z review. Mark alone gates merge. Stop and return a BLOCKED receipt on missing access/dependencies, exhausted approved budget, a required out-of-scope change, or two unsuccessful repair attempts after the first build failure. No silent architecture redesign or fallback to a hosted/networked demo.",
+  "explicit_non_goals": [
+    "Nonce/request-bound ACK (P0b): a shell test token is not an ACK implementation",
+    "Physical laptop/USB/EFI writes (P0c)",
+    "GUI, networking, SSH, package manager, Python or model runtime in guest",
+    "MCP, OpenRouter, external agents inside guest, orchestration service",
+    "SquashFS/OverlayFS modules, full Chamber containment, scrubber, recorder, security sign-off",
+    "Full MergeBot implementation, automatic merge, release or deployment"
+  ]
+}

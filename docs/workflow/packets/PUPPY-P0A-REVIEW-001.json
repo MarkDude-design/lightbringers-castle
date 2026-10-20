@@ -1,0 +1,23 @@
+{
+  "task_id": "PUPPY-P0A-REVIEW-001",
+  "model_requested": "gpt-6-luna",
+  "reasoning_requested": "low",
+  "parent_context": "none",
+  "input_file": "/workspace/scratch/ecc459cb12c0/puppy-p0-workflow/docs/workflow/packets/PUPPY-P0A-001.json",
+  "input_sha256": "bfd883d6ad82c2e4434d976e4a198f73c41bbed8fb3a401d194ed3a7c0115d1e",
+  "read_only_inputs": [
+    "/workspace/scratch/ecc459cb12c0/puppy-p0-workflow/docs/workflow/packets/PUPPY-P0A-001.json",
+    "/workspace/scratch/ecc459cb12c0/puppy-p0-workflow/docs/workflow/README.md",
+    "/workspace/scratch/ecc459cb12c0/puppy-p0-workflow/docs/workflow/receipt-template.json"
+  ],
+  "output_file": "/workspace/scratch/ecc459cb12c0/puppy-p0-workflow/docs/workflow/reviews/PUPPY-P0A-REVIEW-001.json",
+  "scope": "Read only these three files. No archive/repo rereads, web, coding or new delegation. Check first-stage boundaries, objective acceptance criteria, cost receipt completeness and contradictions. Write only the output file.",
+  "output_contract": {
+    "input_sha256": "must equal actual checked input",
+    "findings": "array of {severity,location,issue,suggested_fix}; include only concrete issues",
+    "result": "PASS or NEEDS_REVISION",
+    "usage_evidence": "null unless directly exposed; never estimate token charges"
+  },
+  "max_output_chars": 7000,
+  "started_at_utc": "2026-10-20T02:29:43.636419+00:00"
+}

@@ -1,0 +1,20 @@
+{
+  "task_id": "PUPPY-P0A-REVIEW-001",
+  "input_sha256": "bfd883d6ad82c2e4434d976e4a198f73c41bbed8fb3a401d194ed3a7c0115d1e",
+  "findings": [
+    {
+      "severity": "minor",
+      "location": "docs/workflow/packets/PUPPY-P0A-001.json:authority.worker_model and authority.allocation_status",
+      "issue": "The packet leaves worker_model null and allocation pending Z assignment, while the review trial identifies gpt-6-luna as the requested reviewer. The build worker identity and assignment are therefore intentionally unresolved; treating the candidate lane as an assignment would bypass the stated Z authority.",
+      "suggested_fix": "Before dispatch, have Z record the selected build worker/model and assignment in a versioned packet or accompanying authorization; do not infer it from the reviewer trial."
+    },
+    {
+      "severity": "minor",
+      "location": "docs/workflow/packets/PUPPY-P0A-001.json:acceptance[\"Receipt includes packet hash...\"] and docs/workflow/receipt-template.json:usage.source",
+      "issue": "The acceptance criterion requires usage/cost evidence or explicit nulls, but the template starts usage.source as \"unavailable until provider receipt is supplied\" and does not define a terminal representation distinguishing an unavailable source from measured zero or unresolved data.",
+      "suggested_fix": "At receipt completion, set source to the observed evidence source or \"unavailable\" and retain null numeric values; keep cost_coverage unknown when any necessary cost is unknown, as specified in the workflow README."
+    }
+  ],
+  "result": "NEEDS_REVISION",
+  "usage_evidence": null
+}
