@@ -52,6 +52,19 @@ support first. This may reserve more completion capacity for final JSON but is
 not proof it will succeed. Do not silently add a provider parameter, increase
 the cap, substitute a model, or submit another request.
 
+### Reviewed next preparation: opt-in low reasoning
+
+Architecture review approved preparing the explicit `low` option as a separate
+change, without authorizing another live attempt. See
+[the optional configuration contract](../castle/PROJECT_TASKS.md#optional-low-reasoning-effort)
+and `specs/tasks/room-registry-ticket-paid-gpt-oss-20b-low-reasoning.json`.
+The original paid configuration remains unchanged; the new example preserves
+its task content/ID, models, completion cap, pricing, and $0.05 cumulative budget.
+The failed attempt and its $0.000369954 charge stay in the original ledger.
+The historical proposal above was unimplemented at the time of that receipt;
+this follow-up prepares it for code review and offline verification only.
+No further model call, acceptance, or merge is authorized by this preparation.
+
 ## Earlier cloud follow-through — 2026-10-20 UTC (historical funding blocker)
 
 After PRs #9 and #10 merged, this checkout was based on

@@ -39,7 +39,7 @@ For the explicitly authorized paid-model preparation, see
 
 ## Configuration and budget
 
-The example JSON is the complete configuration contract. Require explicit
+The example JSON supplies the required configuration fields. Require explicit
 `owner/model` worker/reviewer IDs; `openrouter/free`, `openrouter/auto`, and all
 `openrouter/*` router IDs are rejected. Both roles use OpenRouter in v0. There is
 no automatic model substitution or retry. Provider fallback is disabled and
@@ -90,6 +90,50 @@ attempt without automatic approval. These states describe reported IDs, not
 checkpoint attestation. The reviewer may intentionally be a different named
 model from the worker; that role choice is not model drift. There is no
 within-role model ladder in this two-call workflow.
+
+## Optional low reasoning effort
+
+An additional configuration field opts both roles into lower reasoning effort:
+
+```json
+"reasoning_effort": "low"
+```
+
+Only the explicit string `low` is supported by this bounded option. Omit the
+field to preserve the existing provider default and request shape; null and
+other values are errors. Existing example configurations are unchanged. The
+separate prepared example is
+`specs/tasks/room-registry-ticket-paid-gpt-oss-20b-low-reasoning.json`.
+It retains the original task ID, source selection, models, $0.05 cumulative
+budget, dated prices, and 2,048 completion-token cap.
+
+Dry-run adds `requested_reasoning_effort: "low"` to each role's plan. Each
+opted-in API request contains `reasoning: {"effort": "low"}`, retained in
+`receipt.json` before transport. Neither `exclude` nor a separate reasoning-token
+limit is sent. Hiding reasoning would not stop it consuming completion tokens.
+The full completion cap still covers reasoning and final output; lower effort
+does not guarantee that final JSON will fit or that the provider will succeed.
+
+Before separately authorized live use, refresh official model/provider metadata
+and confirm support for **all three** request parameters: `reasoning`,
+`response_format` (JSON mode), and `max_tokens`, including the selected effort
+and completion capacity. Recheck conservative pricing, secure credentials,
+account funding/caps, STOP/locks, and the original task's complete ledger.
+`provider.require_parameters: true` and `provider.allow_fallbacks: false` remain
+enforced; an unsupported-parameter error stops the attempt without removal,
+substitution, or retry. Dry-run stays offline and does not certify provider
+support or authorize another attempt.
+
+The [dated support observation](../docs/evidence/gpt-oss-20b-low-reasoning-support-20261020.json)
+records nine endpoints advertising these parameters, eight with status `0`,
+and the limits of this evidence. Parameter-name advertisements do not attest
+effort values or successful live output. OpenRouter's
+[reasoning guide](https://openrouter.ai/docs/guides/best-practices/reasoning-tokens)
+documents the effort setting; its independent page retrieval was blocked during
+this preparation. No live test of `low` occurred. Changing reasoning does not
+reset accounting: the failed **$0.000369954** remains charged to
+`room-registry-error-ticket-v0` within the original **$0.05** local budget.
+Mark's merge decision and authorization for a new attempt are separate.
 
 ## Frozen packet and output contracts
 

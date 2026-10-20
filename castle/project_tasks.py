@@ -180,8 +180,11 @@ def freeze_packet(repo, task, commit):
 
 
 def validate_config(config):
+    optional = ('reasoning_effort',) if isinstance(config, dict) and 'reasoning_effort' in config else ()
     fields(config, ('task', 'worker_model', 'reviewer_model', 'budget_usd', 'allow_paid',
-                    'max_completion_tokens', 'pricing'))
+                    'max_completion_tokens', 'pricing') + optional)
+    if optional:
+        require(config['reasoning_effort'] == 'low', 'reasoning_effort must be the explicit string low')
     require(type(config['allow_paid']) is bool, 'allow_paid must be boolean')
     require(type(config['max_completion_tokens']) is int and
             1 <= config['max_completion_tokens'] <= MAX_COMPLETION_TOKENS,
@@ -244,6 +247,8 @@ def plan(config, packet, prior=None):
         cost, error = estimate(config, config[role + '_model'], size)
         estimates[role] = {'requested_model': config[role + '_model'], 'prompt_byte_reserve': size,
                            'estimated_cost_usd': str(cost) if cost is not None else None}
+        if 'reasoning_effort' in config:
+            estimates[role]['requested_reasoning_effort'] = config['reasoning_effort']
         if error:
             reasons.append(error)
     total = (sum(money(value['estimated_cost_usd']) for value in estimates.values())
@@ -512,6 +517,8 @@ def run_task(repo, config, packet, key, stop_file=None):
                         'max_tokens': config['max_completion_tokens'],
                         'response_format': {'type': 'json_object'},
                         'provider': {'allow_fallbacks': False, 'require_parameters': True}}
+                if 'reasoning_effort' in config:
+                    body['reasoning'] = {'effort': config['reasoning_effort']}
                 call = {'role': role, 'requested_model': model, 'started_at': now(),
                         'request': body, 'reported_cost_usd': None, 'accounting_complete': False,
                         'status': 'in_flight'}
