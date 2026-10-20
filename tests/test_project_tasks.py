@@ -430,6 +430,137 @@ class ProjectTaskTests(unittest.TestCase):
             self.assertEqual(len(self.requests), 1)
             self.assertFalse(self.load(result)[2]['schema_valid'])
 
+    def test_task_capitalization_preserves_packet_and_prior_budget(self):
+        original_hash = tasks.digest(self.packet)
+        self.run_task()
+        self.config['task']['task_id'] = 'FIXTURE-TASK'
+        self.config['budget_usd'] = '0.0015'
+        self.packet = self.freeze()
+        self.assertEqual(self.packet['task_id'], 'fixture-task')
+        self.assertEqual(tasks.digest(self.packet), original_hash)
+        self.assertEqual(tasks.report(self.repo, 'FIXTURE-TASK')['total_recorded_spend_usd'], '0.002')
+        self.assertFalse(tasks.plan(self.config, self.packet,
+                                   tasks.report(self.repo, 'FIXTURE-TASK'))['can_run'])
+        before = len(self.requests)
+        with self.assertRaisesRegex(ValueError, 'budget'):
+            self.run_task()
+        self.assertEqual(len(self.requests), before)
+
+    def test_legacy_mixed_case_directory_reuses_evidence_and_lock(self):
+        result = self.run_task()
+        run, manifest, _ = self.load(result)
+        frozen = {name: (run / name).read_bytes() for name in manifest['files']}
+        root = tasks.runs_root(self.repo)
+        # Use a temporary name so this works on case-insensitive filesystems too.
+        run.parent.rename(root / 'renaming-task')
+        (root / 'renaming-task').rename(root / 'Fixture-Task')
+        legacy_run = root / 'Fixture-Task' / run.name
+        self.assertEqual(tasks.report(self.repo, 'FIXTURE-TASK')['total_recorded_spend_usd'], '0.002')
+        self.config['budget_usd'] = '0.0015'
+        before = len(self.requests)
+        with self.assertRaisesRegex(ValueError, 'budget'):
+            self.run_task()
+        self.assertEqual(len(self.requests), before)
+        self.assertEqual({name: (legacy_run / name).read_bytes() for name in frozen}, frozen)
+        self.assertEqual(tasks.task_directory(self.repo, 'FIXTURE-TASK'), legacy_run.parent)
+        with tasks.task_lock(legacy_run.parent):
+            with self.assertRaisesRegex(ValueError, 'ledger lock'):
+                tasks.offline_operation(self.repo, result['run'].upper().split('/')[0] + '/' + run.name,
+                                        'accept', manifest['files']['worker.json'])
+        accepted = tasks.offline_operation(self.repo, result['run'], 'accept',
+                                          manifest['files']['worker.json'])
+        self.assertEqual(accepted['report']['accepted_result_count'], 1)
+        self.assertFalse((root / 'fixture-task').exists() and
+                         (root / 'fixture-task').resolve() != legacy_run.parent.resolve())
+
+    def test_ambiguous_task_directories_block_spending(self):
+        self.run_task()
+        root = tasks.runs_root(self.repo)
+        lower, upper = root / 'fixture-task', root / 'FIXTURE-TASK'
+        upper.mkdir(exist_ok=True)
+        original_iterdir = Path.iterdir
+        def aliases(path):
+            # Duplicate case aliases are simulated on Windows, where a real
+            # directory listing cannot contain both names as distinct entries.
+            return iter([lower, upper]) if path == root else original_iterdir(path)
+        before = len(self.requests)
+        with patch.object(Path, 'iterdir', aliases):
+            with self.assertRaisesRegex(ValueError, 'Ambiguous task directory'):
+                tasks.report(self.repo)
+            with self.assertRaisesRegex(ValueError, 'Ambiguous task directory'):
+                self.run_task()
+        self.assertEqual(len(self.requests), before)
+
+    def test_active_run_refuses_offline_writers_without_losing_acceptance(self):
+        original_save = tasks.save_state
+        checked = False
+        def interleave(run, receipt, manifest):
+            nonlocal checked
+            original_save(run, receipt, manifest)
+            if not checked and 'worker.json' in manifest['files'] and len(receipt['calls']) == 1:
+                checked = True
+                name = run.relative_to(tasks.runs_root(self.repo)).as_posix()
+                self.assertFalse(tasks.report(self.repo)['accounting_complete'])
+                for operation in ('accept', 'reject', 'export-z'):
+                    with self.assertRaisesRegex(ValueError, 'ledger lock'):
+                        tasks.offline_operation(self.repo, name, operation,
+                                                manifest['files']['worker.json'])
+                    self.assertTrue((run.parent / '.active').exists())
+                self.assertFalse((run / 'decision.json').exists())
+                self.assertFalse((run / 'z-review-packet.json').exists())
+        with patch.object(tasks, 'save_state', side_effect=interleave):
+            result = self.run_task()
+        self.assertTrue(checked)
+        run, manifest, receipt = self.load(result)
+        self.assertEqual(receipt['human_acceptance'], 'not_recorded')
+        accepted = tasks.offline_operation(self.repo, result['run'], 'accept',
+                                          manifest['files']['worker.json'])
+        self.assertEqual(accepted['report']['accepted_result_count'], 1)
+        self.assertEqual(self.load(result)[2]['human_acceptance'], 'accept')
+
+    def test_overlapping_offline_export_cannot_discard_human_decision(self):
+        result = self.run_task()
+        _, manifest, _ = self.load(result)
+        original_read = tasks.read_run
+        checked = False
+        def interleave(run):
+            nonlocal checked
+            loaded = original_read(run)
+            if not checked:
+                checked = True
+                with self.assertRaisesRegex(ValueError, 'ledger lock'):
+                    tasks.offline_operation(self.repo, result['run'], 'export-z')
+            return loaded
+        with patch.object(tasks, 'read_run', side_effect=interleave):
+            tasks.offline_operation(self.repo, result['run'], 'accept', manifest['files']['worker.json'])
+        self.assertTrue(checked)
+        tasks.offline_operation(self.repo, result['run'], 'export-z')
+        run, manifest, receipt = self.load(result)
+        self.assertIn('decision.json', manifest['files'])
+        self.assertIn('z-review-packet.json', manifest['files'])
+        self.assertEqual(receipt['human_acceptance'], 'accept')
+        self.assertEqual(tasks.report(self.repo)['accepted_result_count'], 1)
+
+    def test_crash_after_recorded_response_blocks_spending_and_offline_mutation(self):
+        original_save = tasks.save_state
+        def crash(run, receipt, manifest):
+            original_save(run, receipt, manifest)
+            if receipt['status'] == 'response_received':
+                raise SystemExit('Simulated exit before artifact validation')
+        with patch.object(tasks, 'save_state', side_effect=crash):
+            with self.assertRaises(SystemExit):
+                self.run_task()
+        run = next((tasks.runs_root(self.repo) / 'fixture-task').iterdir())
+        name = run.relative_to(tasks.runs_root(self.repo)).as_posix()
+        self.assertEqual(tasks.read_run(run)[1]['calls'][0]['reported_cost_usd'], '0.001')
+        self.assertFalse(tasks.report(self.repo)['accounting_complete'])
+        self.assertEqual(tasks.report(self.repo)['total_recorded_spend_usd'], '0.001')
+        with self.assertRaisesRegex(ValueError, 'not terminal'):
+            tasks.offline_operation(self.repo, name, 'export-z')
+        with self.assertRaisesRegex(ValueError, 'Prior attempt accounting'):
+            self.run_task()
+        self.assertEqual(len(self.requests), 1)
+
     def test_incomplete_accounting_never_yields_an_accepted_result_ratio(self):
         def missing_cost(*args):
             result = self.provider(*args)

@@ -1,5 +1,6 @@
 """Budgeted Project Tasks v0: proposals and local receipts, never code execution."""
 import argparse
+from contextlib import contextmanager
 from datetime import date, datetime, timezone
 from decimal import Decimal, InvalidOperation
 import hashlib
@@ -29,6 +30,7 @@ MODEL = re.compile(r'^[a-z0-9_.-]+/[A-Za-z0-9_.:-]+$')
 SECRET = re.compile(r'sk-or-v1-[A-Za-z0-9_-]+|sk-[A-Za-z0-9_-]{20,}|-----BEGIN (?:[A-Z ]+ )?PRIVATE KEY-----')
 SOURCE_EXTENSIONS = {'.py', '.md', '.json', '.csv', '.js', '.txt'}
 FORBIDDEN_NAMES = {'node_modules', 'venv', 'dist', 'build', '__pycache__'}
+TERMINAL_STATES = {'reviewed', 'failed', 'stopped', 'interrupted'}
 WORKER_CONTRACT = {
     'schema_version': 'castle-ticket/0.1', 'packet_sha256': '<exact packet hash>',
     'problem': '<concrete problem>',
@@ -143,7 +145,7 @@ def base_commit(repo):
 
 def freeze_packet(repo, task, commit):
     fields(task, ('task_id', 'goal', 'acceptance_criteria', 'boundaries', 'source_files', 'allowed_files'))
-    require(isinstance(task['task_id'], str) and ID.fullmatch(task['task_id']), 'Invalid task ID')
+    identity = task_key(task['task_id'])
     text(task['goal'], 4000)
     strings(task['acceptance_criteria'], 1)
     strings(task['boundaries'], 1)
@@ -168,7 +170,7 @@ def freeze_packet(repo, task, commit):
                         'byte_length': len(data), 'content': data.decode('utf-8')})
     require(sum(source['byte_length'] for source in sources) <= MAX_SOURCE_BYTES,
             'Sources exceed 96 KiB total')
-    packet = {'schema_version': 'castle-task-packet/0.1', 'task_id': task['task_id'],
+    packet = {'schema_version': 'castle-task-packet/0.1', 'task_id': identity,
               'goal': task['goal'], 'acceptance_criteria': task['acceptance_criteria'],
               'boundaries': task['boundaries'], 'allowed_files': task['allowed_files'],
               'base_commit': commit, 'sources': sources}
@@ -354,6 +356,44 @@ def runs_root(repo):
     return root
 
 
+def task_key(task_id):
+    require(isinstance(task_id, str) and ID.fullmatch(task_id), 'Invalid task ID')
+    return task_id.lower()
+
+
+def task_directories(repo):
+    """Resolve case aliases consistently without renaming historical evidence."""
+    root = runs_root(repo)
+    directories = {}
+    if root.exists():
+        for directory in sorted(root.iterdir()):
+            require(not directory.is_symlink() and directory.is_dir(), 'Unexpected run-root entry')
+            identity = task_key(directory.name)
+            require(identity not in directories, 'Ambiguous task directory aliases; inspect ledger before retrying')
+            directories[identity] = directory
+    return directories
+
+
+def task_directory(repo, task_id):
+    identity = task_key(task_id)
+    return task_directories(repo).get(identity, runs_root(repo) / identity)
+
+
+@contextmanager
+def task_lock(directory):
+    """All run and offline ledger mutations share this exclusive lock."""
+    lock = directory / '.active'
+    try:
+        with lock.open('x'):
+            pass
+    except FileExistsError as exc:
+        raise ValueError('Task has an active or stale ledger lock; inspect before retrying') from exc
+    try:
+        yield
+    finally:
+        lock.unlink()
+
+
 def save_state(run, receipt, manifest):
     # FAILURE-CHECK CONTRACT -- reusable across projects (see PROJECT_TASKS.md):
     # Serialize every ledger writer, including offline decisions and exports.
@@ -363,7 +403,7 @@ def save_state(run, receipt, manifest):
     # tamper-proof journal. Their consistency must be checked before spending.
     # Fault tests must cover each persistence boundary and decision interleaving.
     # Optimize measured overhead later without silently weakening this contract.
-    # PR #8 review gaps remain: offline-writer locking and filesystem task aliases.
+    # Callers must hold task_lock; task_key also binds accounting to directory identity.
     receipt['artifact_hashes'] = {name: value for name, value in manifest['files'].items()
                                   if name != 'receipt.json'}
     replace_json(run / 'receipt.json', receipt)
@@ -396,9 +436,9 @@ def report(repo, task_id=None):
         return {'attempts': 0, 'total_recorded_spend_usd': '0', 'accounting_complete': True,
                 'accepted_result_count': 0, 'cost_per_accepted_result_usd': None,
                 'ratio_reason': 'No accepted results'}
-    for task_dir in sorted(root.iterdir()):
-        require(not task_dir.is_symlink() and task_dir.is_dir(), 'Unexpected run-root entry')
-        if task_id is not None and task_dir.name != task_id:
+    identity = task_key(task_id) if task_id is not None else None
+    for key, task_dir in task_directories(repo).items():
+        if identity is not None and key != identity:
             continue
         for run in sorted(task_dir.iterdir()):
             if run.name == '.active':
@@ -410,7 +450,7 @@ def report(repo, task_id=None):
                     if call.get('reported_cost_usd') is not None:
                         total += money(call['reported_cost_usd'])
                     complete = complete and call.get('accounting_complete', False)
-                if receipt['status'] in ('in_flight', 'interrupted'):
+                if receipt['status'] not in TERMINAL_STATES or receipt['status'] == 'interrupted':
                     complete = False
                 if 'decision.json' in manifest['files']:
                     decision = json.loads((run / 'decision.json').read_text())
@@ -433,15 +473,10 @@ def run_task(repo, config, packet, key, stop_file=None):
     no_secrets(packet, [key, *known_keys()])
     require(bool(key), 'No OpenRouter key supplied through hidden entry or environment')
     root = runs_root(repo)
-    task_dir = root / packet['task_id']
-    require(not task_dir.is_symlink(), 'Task directory cannot be a symlink')
+    task_dir = task_directory(repo, packet['task_id'])
     task_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
-    lock = task_dir / '.active'
-    # A stale lock requires human inspection, never automatic replay after a crash.
-    with lock.open('x'):
-        pass
     run = task_dir / uuid.uuid4().hex
-    try:
+    with task_lock(task_dir):
         prior = report(repo, packet['task_id'])
         require(prior['accounting_complete'], 'Prior attempt accounting is incomplete; no further spending')
         spent = money(prior['total_recorded_spend_usd'])
@@ -521,8 +556,6 @@ def run_task(repo, config, packet, key, stop_file=None):
         return {'run': run.relative_to(root).as_posix(), 'status': receipt['status'],
                 'packet_sha256': digest(packet), 'artifact_hashes': manifest['files'],
                 'reviewer_verdict': receipt['reviewer_verdict'], 'report': report(repo, packet['task_id'])}
-    finally:
-        lock.unlink()
 
 
 def find_run(repo, name):
@@ -530,7 +563,7 @@ def find_run(repo, name):
     require(len(parts) == 2 and ID.fullmatch(parts[0]) and re.fullmatch(r'[a-f0-9]{32}', parts[1]),
             'Use task_id/attempt_id from the run receipt')
     root = runs_root(repo)
-    run = root.joinpath(*parts)
+    run = task_directory(repo, parts[0]) / parts[1]
     require(not run.parent.is_symlink() and run.resolve().is_relative_to(root.resolve()),
             'Run escapes local artifacts')
     return run
@@ -539,29 +572,30 @@ def find_run(repo, name):
 def offline_operation(repo, name, operation, expected_hash=None, note=''):
     require(operation in ('export-z', 'accept', 'reject'), 'Unknown offline operation')
     run = find_run(repo, name)
-    manifest, receipt = read_run(run)
-    require(receipt['status'] not in ('in_flight', 'prepared'), 'Attempt may still be running')
-    packet = json.loads((run / 'packet.json').read_text())
-    worker = json.loads((run / 'worker.json').read_text())
-    validate_output(worker, 'worker', packet)
-    worker_hash = digest(worker)
-    require(worker_hash == manifest['files'].get('worker.json'), 'Worker hash mismatch')
-    if operation == 'export-z':
-        bundle = {'schema_version': 'castle-z-export/0.1', 'transport': 'offline_export',
-                  'packet': packet, 'packet_sha256': digest(packet),
-                  'worker': worker, 'worker_sha256': worker_hash,
-                  'review_contract': REVIEW_CONTRACT}
-        artifact(run, manifest, 'z-review-packet.json', bundle)
-    else:
-        require(expected_hash == worker_hash, 'Human decision artifact hash mismatch')
-        require(len(note) <= 1000, 'Human note exceeds 1000 characters')
-        no_secrets(note, known_keys())
-        artifact(run, manifest, 'decision.json', {'decision': operation, 'worker_sha256': worker_hash,
-                 'packet_sha256': digest(packet), 'note': note, 'at': now(), 'actor': 'human'})
-        receipt['human_acceptance'] = operation
-    save_state(run, receipt, manifest)
-    return {'run': name, 'worker_sha256': worker_hash, 'operation': operation,
-            'report': report(repo, packet['task_id'])}
+    with task_lock(run.parent):
+        manifest, receipt = read_run(run)
+        require(receipt['status'] in TERMINAL_STATES, 'Attempt is not terminal; inspect before retrying')
+        packet = json.loads((run / 'packet.json').read_text())
+        worker = json.loads((run / 'worker.json').read_text())
+        validate_output(worker, 'worker', packet)
+        worker_hash = digest(worker)
+        require(worker_hash == manifest['files'].get('worker.json'), 'Worker hash mismatch')
+        if operation == 'export-z':
+            bundle = {'schema_version': 'castle-z-export/0.1', 'transport': 'offline_export',
+                      'packet': packet, 'packet_sha256': digest(packet),
+                      'worker': worker, 'worker_sha256': worker_hash,
+                      'review_contract': REVIEW_CONTRACT}
+            artifact(run, manifest, 'z-review-packet.json', bundle)
+        else:
+            require(expected_hash == worker_hash, 'Human decision artifact hash mismatch')
+            require(len(note) <= 1000, 'Human note exceeds 1000 characters')
+            no_secrets(note, known_keys())
+            artifact(run, manifest, 'decision.json', {'decision': operation, 'worker_sha256': worker_hash,
+                     'packet_sha256': digest(packet), 'note': note, 'at': now(), 'actor': 'human'})
+            receipt['human_acceptance'] = operation
+        save_state(run, receipt, manifest)
+        return {'run': name, 'worker_sha256': worker_hash, 'operation': operation,
+                'report': report(repo, packet['task_id'])}
 
 
 def main(argv=None):

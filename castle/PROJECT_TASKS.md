@@ -61,7 +61,12 @@ The host reserves the two-call estimate before starting and checks the remaining
 budget again before review. It adds actual provider-reported cost after every
 response, including malformed, failed, or rejected attempts. The budget is
 shared across every local attempt with the same `task_id`, even if its packet
-changes. Do not reuse a task ID for unrelated work. An unexpectedly expensive
+changes. Task identity is case-insensitive: new packets and directories use a
+lowercase ID, and reporting, locking, and offline lookup use that same identity.
+A single existing mixed-case directory is reused without renaming or rewriting
+its evidence. Multiple directory aliases for one identity block operations for
+manual inspection, rather than choosing one and hiding its charges.
+Do not reuse a task ID for unrelated work. An unexpectedly expensive
 worker can exceed the local estimate before the host learns its actual charge;
 the reviewer will then be blocked. **Provider-side key credit caps are the
 spending backstop.** A local estimate cannot guarantee the final bill. No key
@@ -173,10 +178,17 @@ spending rather than guessing. Hashes detect corruption, not a malicious editor
 who can rewrite both files. Keep the local ledger; deletion loses local spend
 history and is not an accounting reset supported by this CLI.
 
-A per-task `.active` file prevents concurrent runs. A killed process can leave
-it behind. Inspect its manifest/native evidence and provider account before
-manually resolving a stale lock. There is deliberately no automatic lock
-removal, resume, uncertain-request replay, or accounting-repair command in v0.
+A per-task `.active` file serializes runs and all offline ledger mutations
+(accept, reject, and export). Each operation acquires the same exclusive lock
+before reading and changing ledger state; an active or stale lock refuses a
+conflicting operation without removing the owner's lock. Offline mutations also
+require a terminal attempt state. Reports remain read-only and fail closed on
+inconsistent snapshots. A killed process can leave a stale lock or a nonterminal
+snapshot such as `response_received`; the latter retains known charges but makes
+accounting incomplete and blocks further spending. Inspect its manifest/native
+evidence and provider account before reconciling the attempt or resolving a
+stale lock. There is deliberately no automatic lock removal, resume,
+uncertain-request replay, or accounting-repair command in v0.
 
 The run summary supplies `run` and the `worker.json` SHA-256. Using those values:
 
@@ -233,9 +245,12 @@ The non-rewritable-CD analogy describes the preservation goal. Current packet
 and output artifacts are created once, but receipt/manifest snapshots are
 replaceable local files, not WORM storage or independent backups. An append-only
 journal with an external checkpoint is a possible later implementation, not a
-capability claimed here. The two PR #8 architecture findings (offline-writer
-locking and case-insensitive task aliases) remain open until repaired and tested;
-this note records the required process rather than claiming those repairs.
+capability claimed here. The shared ledger lock and canonical task identity
+enforce the two PR #8 review repairs. Regression fixtures check active-run
+decisions, overlapping offline mutations, legacy directory reuse, ambiguous
+aliases, prior-spend preservation, and interruption after a recorded response.
+The case-alias fixtures run portably; they are not a claim of a live Windows
+or provider acceptance run.
 
 Run `python -m unittest discover -s tests -v` and the separate existing
 `python -m unittest discover -s runtime-probe/tests -v`. Project-task tests use
