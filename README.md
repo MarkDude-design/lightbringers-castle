@@ -28,6 +28,11 @@ It also has an opt-in OpenRouter `read_room` tool that returns actual room JSON
 through a bounded, read-only client-side tool loop. The exact one-command test
 and receipt format are documented in [castle/TALK.md](castle/TALK.md).
 
+For a separate, bounded worker/reviewer proposal workflow, see
+[Budgeted Project Tasks v0](castle/PROJECT_TASKS.md). It supports an offline
+dry run, frozen source packets, cost receipts, and human acceptance without
+applying model-generated changes.
+
 ## Structure
 - Rooms: JSON files describing scenes, jokes, and interactions.
 - Bots: JSON files describing personalities and responses.
