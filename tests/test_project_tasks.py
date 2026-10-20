@@ -615,8 +615,16 @@ class ProjectTaskTests(unittest.TestCase):
         # Reproduce the host finding, not a worker discovery or the proposed repair.
         rooms = self.repo / 'rooms'
         rooms.mkdir()
+        # Exercise an alias on every host, including Linux, rather than relying
+        # on a hosted Windows temp directory to happen to contain one.
+        alias = self.repo / 'room-alias'
+        alias.symlink_to(rooms, target_is_directory=True)
+        rooms = alias
         target = rooms / 'courtyard.json'
         target.write_bytes(b'{"id":"courtyard"}\n')
+        # Windows temp roots can contain an 8.3 alias or junction; room_paths
+        # uses resolved paths, so match that same identity before patching.
+        target = target.resolve()
         original_stat = Path.stat
         original_is_file = Path.is_file
         original_bytes = target.read_bytes()
