@@ -95,6 +95,45 @@ class TalkTests(unittest.TestCase):
         initial = next(row for row in rows if row['event'] == 'call_finished')
         self.assertFalse(any(message['role'] == 'tool' for message in initial['request']['messages']))
 
+    def test_missing_role_final_tool_response_is_rejected_and_never_replayed(self):
+        first = self.tool_response()
+        malformed_message = {'content': 'Malformed final answer must not be replayed.'}
+        natives = [
+            {'id': 'gen-tool', 'model': first['returned_model'],
+             'choices': [{'message': first['message'], 'finish_reason': 'tool_calls'}]},
+            {'id': 'gen-malformed', 'model': first['returned_model'],
+             'choices': [{'message': malformed_message, 'finish_reason': 'stop'}]},
+            {'id': 'gen-next-round', 'model': first['returned_model'],
+             'choices': [{'message': self.final_response()['message'], 'finish_reason': 'stop'}]},
+        ]
+        requests = []
+        def open_response(request, **kwargs):
+            requests.append(json.loads(request.data))
+            response = io.BytesIO(json.dumps(natives[len(requests)-1]).encode())
+            response.status = 200
+            return response
+        with tempfile.TemporaryDirectory() as tmp:
+            args = argparse.Namespace(output=Path(tmp), prompt='Read courtyard.',
+                groq_model='openai/gpt-oss-20b', openrouter_model=first['returned_model'],
+                room_tools=True, stop_file=Path(tmp)/'STOP', rounds=2, interactive=False)
+            with patch('talk.urllib.request.build_opener') as factory, \
+                    patch('talk.time.sleep'), patch('sys.stdout', new=io.StringIO()):
+                factory.return_value.open.side_effect = open_response
+                code = talk.run(args, {'openrouter': 'fixture-key'})
+            rows = [json.loads(line) for line in next(Path(tmp).glob('*.jsonl')).read_text().splitlines()]
+        self.assertEqual(code, 1)
+        self.assertEqual(len(requests), 3)
+        finished = [row for row in rows if row['event'] == 'call_finished']
+        self.assertEqual([row['status'] for row in finished], ['ok', 'error', 'ok'])
+        self.assertEqual(finished[1]['raw'], natives[1])
+        self.assertEqual(finished[1]['error']['type'], 'ValueError')
+        self.assertIsNone(finished[1]['message'])
+        self.assertIsNone(finished[1]['text'])
+        self.assertNotIn(malformed_message['content'], json.dumps(requests[2]['messages']))
+        self.assertTrue(all('role' in message for message in requests[2]['messages']))
+        self.assertEqual(rows[-1]['replies'], 1)
+        self.assertEqual(rows[-1]['counts'], {'ok': 2, 'error': 1, 'stopped': 0})
+
     def test_malformed_tool_calls_are_not_ignored_when_text_is_present(self):
         for tool_calls in ['invalid', {}, 42]:
             native = {'model': 'fixture/tool-model:free', 'choices': [{'message': {

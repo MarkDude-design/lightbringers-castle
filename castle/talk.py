@@ -126,8 +126,11 @@ def complete(provider, key, body):
             raise ValueError('Provider returned a non-assistant message')
         has_text = isinstance(text, str) and bool(text.strip())
         has_tools = isinstance(tool_calls, list) and bool(tool_calls)
-        if has_tools and message.get('role') != 'assistant':
-            raise ValueError('Tool-call message requires role: assistant for continuation')
+        # ROLES RECEPTOR
+        request_messages = body.get('messages', [])
+        follows_tool_result = bool(request_messages and request_messages[-1].get('role') == 'tool')
+        if (has_tools or follows_tool_result) and message.get('role') != 'assistant':
+            raise ValueError('Tool transaction message requires role: assistant for continuation')
         if has_tools and text is not None and not isinstance(text, str):
             raise ValueError('Tool-call message content must be text or null')
         if not has_text and not has_tools:
