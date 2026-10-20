@@ -477,6 +477,178 @@ class ProjectTaskTests(unittest.TestCase):
                 self.assertIsNone(receipt['reviewer_verdict'])
                 self.assertEqual(receipt['human_acceptance'], 'not_recorded')
 
+    def test_all_advertised_output_list_bounds_match_validation(self):
+        worker = self.ticket()
+        review = {'schema_version': 'castle-task-review/0.1',
+                  'packet_sha256': tasks.digest(self.packet), 'worker_sha256': tasks.digest(worker),
+                  'verdict': 'blocked', 'reasons': [{'note': 'More evidence is needed.',
+                      'source_refs': worker['source_refs']}], 'uncertainties': []}
+        for role, original in (('worker', worker), ('reviewer', review)):
+            system = tasks.messages_for(role, self.packet, worker if role == 'reviewer' else None)[0]['content']
+            self.assertIn(json.dumps(tasks.OUTPUT_LIST_BOUNDS[role]), system)
+            for path, (minimum, maximum) in tasks.OUTPUT_LIST_BOUNDS[role].items():
+                counts = {minimum, maximum, maximum + 1}
+                if minimum:
+                    counts.add(minimum - 1)
+                for count in counts:
+                    with self.subTest(role=role, path=path, count=count):
+                        value = copy.deepcopy(original)
+                        container = value['reasons'][0] if path == 'reasons[].source_refs' else value
+                        key = path.split('.')[-1]
+                        seed = container[key][0] if container[key] else 'Unresolved synthetic question.'
+                        container[key] = [copy.deepcopy(seed) for _ in range(count)]
+                        if minimum <= count <= maximum:
+                            tasks.validate_output(value, role, self.packet, worker)
+                        else:
+                            with self.assertRaises(ValueError):
+                                tasks.validate_output(value, role, self.packet, worker)
+
+    def test_all_documented_task_list_bounds_match_packet_freezing(self):
+        names = ['castle/example.py'] + ['castle/example%d.py' % i for i in range(1, 9)]
+        for name in names[1:]:
+            (self.repo / name).write_bytes(b'# Synthetic offline source.\n')
+        for field in ('acceptance_criteria', 'boundaries', 'source_files', 'allowed_files'):
+            for count in (0, 1, 8, 9):
+                with self.subTest(field=field, count=count):
+                    task = copy.deepcopy(self.config['task'])
+                    task['source_files'] = names[:8]
+                    task[field] = (names[:count] if field.endswith('files') else ['Proposed check.'] * count)
+                    if 1 <= count <= 8:
+                        frozen = tasks.freeze_packet(self.repo, task, 'a' * 40)
+                        key = 'sources' if field == 'source_files' else field
+                        self.assertEqual(len(frozen[key]), count)
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'List length'):
+                            tasks.freeze_packet(self.repo, task, 'a' * 40)
+
+    def test_no_repair_and_insufficient_evidence_still_require_proposed_checks(self):
+        for conclusion in ('No repair is established by these sources.',
+                           'Evidence is insufficient to establish a gap.'):
+            for empty in (False, True):
+                with self.subTest(conclusion=conclusion, empty=empty):
+                    self.config['task']['task_id'] = 'conclusion-%d-%s' % (len(conclusion), empty)
+                    self.packet = self.freeze()
+                    self.requests.clear()
+                    def conclude(*args):
+                        response = self.provider(*args)
+                        value = json.loads(response['text'])
+                        if len(self.requests) == 1:
+                            value.update(problem=conclusion, proposed_change='No edits proposed; verify existing handling.',
+                                         acceptance_checks=[] if empty else ['Check the existing greeting result.'],
+                                         uncertainties=['No execution evidence is supplied.'])
+                        else:
+                            value.update(verdict='blocked', reasons=[{
+                                'note': 'The proposed check needs execution evidence.',
+                                'source_refs': self.ticket()['source_refs']}])
+                        response['text'] = json.dumps(value)
+                        response['message']['content'] = response['text']
+                        return response
+                    result = self.run_task(conclude)
+                    run, manifest, receipt = self.load(result)
+                    self.assertEqual(result['status'], 'failed' if empty else 'reviewed')
+                    self.assertEqual(len(self.requests), 1 if empty else 2)
+                    response = receipt['calls'][0]['response']
+                    output = json.loads(response['text'])
+                    self.assertEqual(output['problem'], conclusion)
+                    self.assertEqual(response['raw']['message']['content'], response['text'])
+                    self.assertEqual('worker.json' in manifest['files'], not empty)
+                    self.assertEqual(receipt['reviewer_verdict'], None if empty else 'blocked')
+                    self.assertEqual(result['report']['total_recorded_spend_usd'], '0.001' if empty else '0.002')
+                    self.assertTrue(result['report']['accounting_complete'])
+                    self.assertEqual(result['report']['accepted_result_count'], 0)
+                    self.assertEqual(receipt['human_acceptance'], 'not_recorded')
+                    self.assertFalse((run / 'decision.json').exists())
+
+    def test_overfull_output_lists_fail_without_retry_or_evidence_repair(self):
+        for role, bounds in tasks.OUTPUT_LIST_BOUNDS.items():
+            for path, (_, maximum) in bounds.items():
+                with self.subTest(role=role, path=path):
+                    self.config['task']['task_id'] = 'overfull-' + role + '-' + path.replace('[].', '-')
+                    self.packet = self.freeze()
+                    self.requests.clear()
+                    target = 1 if role == 'worker' else 2
+                    def overfull(*args):
+                        response = self.provider(*args)
+                        if len(self.requests) == target:
+                            value = json.loads(response['text'])
+                            container = value['reasons'][0] if path == 'reasons[].source_refs' else value
+                            key = path.split('.')[-1]
+                            seed = container[key][0] if container[key] else 'Synthetic uncertainty.'
+                            container[key] = [copy.deepcopy(seed) for _ in range(maximum + 1)]
+                            response['text'] = json.dumps(value)
+                            response['message']['content'] = response['text']
+                        return response
+                    result = self.run_task(overfull)
+                    run, manifest, receipt = self.load(result)
+                    self.assertEqual(result['status'], 'failed')
+                    self.assertEqual(len(self.requests), target)
+                    response = receipt['calls'][-1]['response']
+                    rejected = json.loads(response['text'])
+                    container = rejected['reasons'][0] if path == 'reasons[].source_refs' else rejected
+                    self.assertEqual(len(container[path.split('.')[-1]]), maximum + 1)
+                    self.assertEqual(response['raw']['message']['content'], response['text'])
+                    self.assertNotIn('worker.json' if role == 'worker' else 'review.json', manifest['files'])
+                    self.assertTrue(result['report']['accounting_complete'])
+                    self.assertEqual(result['report']['total_recorded_spend_usd'], '0.001' if target == 1 else '0.002')
+                    self.assertEqual(receipt['human_acceptance'], 'not_recorded')
+                    self.assertFalse((run / 'decision.json').exists())
+
+    def test_focused_config_credits_host_finding_and_preserves_task_controls(self):
+        root = Path(__file__).resolve().parents[1]
+        directory = root / 'specs/tasks'
+        previous = json.loads((directory / 'room-registry-ticket-paid-gpt-oss-20b-low-reasoning.json').read_text())
+        focused = json.loads((directory / 'room-registry-enumeration-ticket-paid-gpt-oss-20b-low-reasoning.json').read_text())
+        tasks.validate_config(focused)
+        self.assertEqual({k: v for k, v in focused.items() if k != 'task'},
+                         {k: v for k, v in previous.items() if k != 'task'})
+        for field in ('task_id', 'boundaries', 'source_files', 'allowed_files'):
+            self.assertEqual(focused['task'][field], previous['task'][field])
+        frozen = tasks.freeze_packet(root, focused['task'], 'a' * 40)
+        self.assertIn('Host finding (Codex synthetic offline probe, not a worker discovery)', frozen['goal'])
+        self.assertIn('resolved.stat()', frozen['goal'])
+        self.assertIn('before its read-time try/except', frozen['goal'])
+        self.assertIn('host finding', ' '.join(frozen['acceptance_criteria']))
+        for source in frozen['sources']:
+            self.assertEqual(source['sha256'], hashlib.sha256((root / source['path']).read_bytes()).hexdigest())
+
+    def test_host_enumeration_gap_fixture_distinguishes_read_time_handling(self):
+        # Reproduce the host finding, not a worker discovery or the proposed repair.
+        rooms = self.repo / 'rooms'
+        rooms.mkdir()
+        target = rooms / 'courtyard.json'
+        target.write_bytes(b'{"id":"courtyard"}\n')
+        original_stat = Path.stat
+        original_is_file = Path.is_file
+        original_bytes = target.read_bytes()
+        for error in (FileNotFoundError, PermissionError):
+            with self.subTest(error=error.__name__):
+                state = {'armed': False, 'is_file_results': [], 'failures': 0}
+                def existing(path):
+                    result = original_is_file(path)
+                    if path == target:
+                        state['is_file_results'].append(result)
+                        state['armed'] = result
+                    return result
+                def disappearing(path, *args, **kwargs):
+                    # Path.resolve may stat on some Python/platform versions.
+                    # Arm only after the real is_file check has returned true.
+                    if path == target and state['armed']:
+                        state['failures'] += 1
+                        raise error('Synthetic enumeration size-stat failure')
+                    return original_stat(path, *args, **kwargs)
+                with patch.object(Path, 'stat', disappearing), patch.object(Path, 'is_file', existing):
+                    with self.assertRaisesRegex(error, 'enumeration size-stat'):
+                        tasks.talk.room_tools.read_room({'room_id': 'courtyard'}, rooms)
+                self.assertEqual(state['is_file_results'], [True])
+                self.assertEqual(state['failures'], 1)
+                with patch.object(Path, 'read_text', side_effect=error('Synthetic read-time failure')):
+                    result = tasks.talk.room_tools.read_room({'room_id': 'courtyard'}, rooms)
+                self.assertFalse(result['ok'])
+                self.assertEqual(result['error']['code'], 'room_read_failed')
+                self.assertEqual(result['error']['message'], error.__name__)
+        self.assertTrue(tasks.talk.room_tools.read_room({'room_id': 'courtyard'}, rooms)['ok'])
+        self.assertEqual(target.read_bytes(), original_bytes)
+
     def test_byte_length_citation_is_rejected_without_clipping_or_trusting_metadata(self):
         # Synthetic source with the observed 125-line/4842-byte shape.
         raw = b'x' * 4717 + b'\n' * 125

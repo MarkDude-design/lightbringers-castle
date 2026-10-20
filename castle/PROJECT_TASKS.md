@@ -158,7 +158,11 @@ from `content`, so an incorrect metadata count cannot permit an invalid citation
 
 Input bounds:
 
-- 1..8 files; at most 32 KiB per file and 96 KiB source bytes in total.
+- `acceptance_criteria`, `boundaries`, `source_files`, and `allowed_files` each
+  require 1..8 entries. Criteria/boundaries are nonempty strings of at most
+  1,000 characters; file paths are nonempty strings of at most 200 characters.
+  The frozen packet's `sources` has the same 1..8 bound as `source_files`.
+  At most 32 KiB per file and 96 KiB source bytes in total.
 - At most 128 KiB canonical packet/config and 160 KiB per prompt envelope,
   including a conservative reserved worker envelope for review. Large packets
   can hit the reviewer prompt limit before the source-byte limit.
@@ -203,6 +207,47 @@ references. An existence precheck alone does not fix a file disappearance race.
 If the supplied sources cannot establish a gap, state that uncertainty instead
 of inventing missing behavior. These are model instructions, not proof that a
 future output will be substantively correct.
+
+All output list bounds are inclusive and included in each role's prompt:
+
+| Role | List | Entries |
+| --- | --- | --- |
+| Worker | `source_refs` | 1..12 |
+| Worker | `allowed_files` | 1..8 |
+| Worker | `acceptance_checks` | 1..8 |
+| Worker | `uncertainties` | 0..8 |
+| Reviewer | `reasons` | 1..8 |
+| Reviewer | Each `reasons[].source_refs` | 1..12 |
+| Reviewer | `uncertainties` | 0..8 |
+
+Acceptance checks and uncertainties contain nonempty strings of at most 1,000
+characters; allowed-file paths have at most 200 characters. A reviewer reason
+has a nonempty `note` of at most 2,000 characters and its own reference list.
+These bounds do not replace the overall output-byte limit or path/line checks.
+
+A no-repair or evidence-insufficient conclusion keeps the same schema: explain
+it in `problem`/`proposed_change`, cite the existing handling, state uncertainties,
+and supply **1..8 proposed acceptance checks**. Checks should verify the existing
+handling or resolve the evidence gap; an empty list is rejected, never filled.
+Keep `allowed_files` a nonempty subset of the packet allowlist even if no edits
+are proposed; this identifies scope and does not authorize implementation.
+The reviewer must assess whether the cited handling covers the alleged failure
+path and whether the checks can substantiate the conclusion. Valid JSON alone
+does not justify `pass`; unsupported conclusions need `needs_changes` or `blocked`.
+Neither role may report proposed checks as executed.
+
+The next focused, **unexecuted** example is
+`specs/tasks/room-registry-enumeration-ticket-paid-gpt-oss-20b-low-reasoning.json`.
+It explicitly credits a **host finding** from Codex's synthetic offline probe:
+`room_paths` can raise at the size `stat()` after `is_file()` succeeds, before
+`read_room` reaches its existing read-time exception handler. This is not a
+worker discovery. The packet asks the worker to check that finding against the
+unchanged selected sources and propose bounded failure-injection checks.
+The historical examples remain intact. The focused example retains the same
+`room-registry-error-ticket-v0` task ID, models, low reasoning, 2,048-token cap,
+$0.05 cumulative local budget, allowlist, and historical pricing observation.
+It does not refresh provider support/pricing or authorize another live attempt.
+Preflight and separate live authorization remain necessary.
 
 Allowed files must be a subset of the host's packet allowlist, which is itself
 a subset of the selected source paths in v0. References must resolve to supplied
