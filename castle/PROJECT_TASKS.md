@@ -205,6 +205,38 @@ not an independently reconciled account bill.
 
 ## Verification and design provenance
 
+### Reusable failure-check contract
+
+Mark's process rule: failures may happen; we must be able to track and check
+them. Use this contract in other projects, not just this task runner:
+
+- Serialize ledger mutations: one writer at a time, including offline human
+  decisions and exports. Serialization is exclusive ordering; evidence
+  preservation is a separate requirement.
+- Preserve original inputs, validated outputs, known charges, failures, and
+  human decisions. Record what is known, what is uncertain, and why work stopped.
+  A timeout or lost response is not proof that the request did not execute.
+- Check hashes, state, task identity, and accounting before spending or changing
+  a decision. Unknown outcomes must not become automatic retries or zero costs.
+- Fault-inject interruption around persistence and transport boundaries. Check
+  that restart refuses uncertain work, successful decisions remain discoverable,
+  and filesystem aliases cannot hide earlier charges. Include overlapping
+  accept/reject/export operations in these checks.
+- For a failed check, identify the affected attempt, preserve the evidence, and
+  state the required reconciliation. Do not invent successful recovery. v0 has
+  no automatic reconciliation command.
+- Optimize only after measuring overhead and retaining regression evidence.
+  Optional review passes can be reduced independently; removing an integrity or
+  spending check is an explicit contract change, not a silent speed improvement.
+
+The non-rewritable-CD analogy describes the preservation goal. Current packet
+and output artifacts are created once, but receipt/manifest snapshots are
+replaceable local files, not WORM storage or independent backups. An append-only
+journal with an external checkpoint is a possible later implementation, not a
+capability claimed here. The two PR #8 architecture findings (offline-writer
+locking and case-insensitive task aliases) remain open until repaired and tested;
+this note records the required process rather than claiming those repairs.
+
 Run `python -m unittest discover -s tests -v` and the separate existing
 `python -m unittest discover -s runtime-probe/tests -v`. Project-task tests use
 offline provider fixtures and actual temporary packet/ledger files. No claim

@@ -355,6 +355,15 @@ def runs_root(repo):
 
 
 def save_state(run, receipt, manifest):
+    # FAILURE-CHECK CONTRACT -- reusable across projects (see PROJECT_TASKS.md):
+    # Serialize every ledger writer, including offline decisions and exports.
+    # Preserve frozen inputs, outputs, and known failure evidence; an uncertain
+    # request stays uncertain until checked, never silently retried or reset.
+    # Receipt/manifest files are mutable snapshots, NOT write-once media or a
+    # tamper-proof journal. Their consistency must be checked before spending.
+    # Fault tests must cover each persistence boundary and decision interleaving.
+    # Optimize measured overhead later without silently weakening this contract.
+    # PR #8 review gaps remain: offline-writer locking and filesystem task aliases.
     receipt['artifact_hashes'] = {name: value for name, value in manifest['files'].items()
                                   if name != 'receipt.json'}
     replace_json(run / 'receipt.json', receipt)
