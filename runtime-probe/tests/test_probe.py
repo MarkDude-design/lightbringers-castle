@@ -33,6 +33,26 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(result['error']['errno'],13)
         self.assertFalse(result['value']['launched'])
 
+    def test_child_environment_contains_only_required_system_variable(self):
+        synthetic={'SystemRoot':r'C:\Windows', 'OPENROUTER_API_KEY':'synthetic-key',
+                   'GH_TOKEN':'synthetic-token', 'HTTPS_PROXY':'synthetic-proxy',
+                   'PATH':'synthetic-path'}
+        with patch.dict(probe.os.environ,synthetic,clear=True):
+            for system,expected in [('Windows',{'SystemRoot':r'C:\Windows'}),
+                                    ('Linux',{})]:
+                with self.subTest(system=system),patch.object(probe.platform,'system',return_value=system):
+                    self.assertEqual(probe._child_environment(),expected)
+
+    def test_missing_windows_system_root_fails_before_launch(self):
+        with patch.dict(probe.os.environ,{},clear=True),\
+             patch.object(probe.platform,'system',return_value='Windows'),\
+             patch.object(probe.subprocess,'Popen') as launch:
+            result=probe.child_probe()
+        launch.assert_not_called()
+        self.assertEqual(result['error']['type'],'RuntimeError')
+        self.assertEqual(result['error']['message'],'Windows child requires SystemRoot')
+        self.assertFalse(result['value']['launched'])
+
     def test_termination_does_not_depend_on_communicate_timeout_output(self):
         original=probe.subprocess.Popen
         def launch(*args,**kwargs):

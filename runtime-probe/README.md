@@ -39,7 +39,11 @@ python -m unittest discover -s tests -v
 The JSON result goes to stdout; probe-ID-tagged events go to stderr. Failed
 capabilities remain individual records. Unsupported resource observations are
 null with their actual error. A failed check does not discard other checks.
-Subprocess code is fixed, bounded, and launched with an empty child environment.
+Subprocess code is fixed and bounded. Its child environment is empty on POSIX;
+on Windows it contains only the required `SystemRoot` system variable. Provider
+keys, tokens, proxy settings, and PATH are not inherited. Missing Windows
+`SystemRoot` fails explicitly before process launch. See the retained
+[Windows verification repair record](../docs/OFFLINE_VERIFICATION_REPAIR.md).
 
 To repeat SDK validation, install the pinned dependencies in a fresh virtual
 environment, then run `python verify_sdk.py`. That command makes no API calls

@@ -45,3 +45,26 @@ no credentials, network access, live inference, or deployment.
 
 Run `python scripts/verify.py` locally; hosted Linux/Windows matrix results
 must be observed for the repaired head before claiming platform acceptance.
+
+## Follow-up: Python 3.10 Windows process startup
+
+The [first repaired-head run](https://github.com/MarkDude-design/lightbringers-castle/actions/runs/39482214063)
+on `a03c51a056b460dd9009486ea0475aabdc5cb3aa` passed both Linux jobs and
+Windows 3.12. Windows 3.10 passed all 74 conversation/project/verifier tests
+but failed four of 11 runtime-probe tests because child creation raised
+`OSError: [WinError 87] The parameter is incorrect` before launch.
+
+Its artifact `offline-windows-latest-py3.10` (ID `12292250577`) was downloaded;
+archive SHA-256 matched the reported digest
+`333f0eaccc008a5540a0332ca8892f2c32f2ff483dd42547d446910e2a1cc7c5`.
+The remaining compilation, JSON, JavaScript, CLI, and whitespace checks passed.
+
+The original empty child environment is now empty on POSIX and explicitly
+allowlists only `SystemRoot` on Windows. Python's
+[subprocess documentation](https://docs.python.org/3.10/library/subprocess.html#subprocess.Popen)
+requires an explicitly supplied environment to include variables needed for
+program startup, including Windows `SystemRoot` for side-by-side assemblies.
+No API keys, tokens, proxies, or PATH are inherited. Missing `SystemRoot`
+fails before launch. Regression fixtures verify the exact environment allowlist
+and the missing-variable failure. This is an explicit compatibility change to
+the child environment boundary; it does not authorize broader inheritance.

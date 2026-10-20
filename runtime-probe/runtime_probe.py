@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 import importlib.metadata
 import importlib.util
 import json
+import os
 from pathlib import Path
 import platform
 import re
@@ -58,6 +59,17 @@ def temporary_file():
     return {'value':state, 'error':state['cleanup_error']}
 
 
+def _child_environment():
+    # Never inherit credentials, proxies, or PATH. Windows requires SystemRoot
+    # for process startup; an empty environment fails on Python 3.10 there.
+    if platform.system()=='Windows':
+        root=os.environ.get('SystemRoot')
+        if not root:
+            raise RuntimeError('Windows child requires SystemRoot')
+        return {'SystemRoot':root}
+    return {}
+
+
 def _await_child_ready(proc, ready):
     deadline=time.monotonic()+5
     while True:
@@ -73,7 +85,7 @@ def _await_child_ready(proc, ready):
 
 
 def child_probe(terminate=False):
-    """Launch only fixed Python code; pass an empty child environment."""
+    """Launch fixed Python code with no inherited application credentials."""
     code="print('runtime-probe-child-ready', flush=True)"
     if terminate:code += '; import time; time.sleep(30)'
     proc=None
@@ -102,7 +114,7 @@ def child_probe(terminate=False):
     try:
         proc=subprocess.Popen([sys.executable,'-I','-u','-c',code],
                               stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,
-                              stderr=subprocess.PIPE,text=True,env={})
+                              stderr=subprocess.PIPE,text=True,env=_child_environment())
         value['launched']=True
         for name in ('stdout','stderr'):
             reader=threading.Thread(target=read_stream,
