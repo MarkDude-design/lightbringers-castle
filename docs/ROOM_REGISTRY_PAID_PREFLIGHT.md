@@ -1,17 +1,67 @@
 # First room-registry task: paid-model preflight
 
-Status: **one funded live attempt failed at the completion cap; evidence and
-reported cost preserved; no retry authorized**. The earlier funding blocker was
-resolved before this attempt. No runtime or generated repair code changed.
+Status: **the low-reasoning follow-up returned JSON but failed the ticket
+contract; both attempt charges preserved; no retry authorized**. No runtime or
+generated room repair changed during this receipt update.
 
-The host authorized exactly one attempt, at most two inference calls, and a
-$0.05 local task budget. That authorization has now been used by the single
-attempt below. Its second call was never sent; it is not permission to retry
-the worker. No additional attempt, automatic human acceptance, implementing
-the proposed repair, merge, deployment, account upgrade, or adding credits is
-authorized by this handback.
+The original attempt and one separately authorized low-reasoning attempt have
+completed, each after preflight and with at most two permitted inference calls.
+Each actually sent one worker call and stopped before review. Both charges
+remain under the same logical task and cumulative $0.05 local budget. Neither
+unused reviewer call is permission to retry. No further attempt, automatic human
+acceptance, proposed repair implementation, deployment, or merge is authorized
+by this receipt.
 
-## Funded live attempt — 2026-10-20 UTC
+## Low-reasoning follow-up — 2026-10-20 UTC
+
+After Mark merged PR #12, a separate “Proceed please” authorized one new attempt
+under the existing cumulative budget. Read-only preflight at
+`2026-10-20T21:34:14Z` confirmed funding/key allowance, fresh endpoint support
+for `reasoning`, `response_format`, and `max_tokens`, complete prior accounting,
+and no STOP or task lock. Nine compatible endpoints reported status `0`; the
+same conservative pricing envelope covered all nine. Prior charge plus the new
+two-call estimate was **$0.015466854**, below **$0.05**. This was local admission,
+not a guaranteed provider billing ceiling.
+
+Source commit: `df25827e7c0a363f559779381f7da465570e7c9a`.
+Configuration: `room-registry-ticket-paid-gpt-oss-20b-low-reasoning.json`.
+The retained worker request included `reasoning: {"effort": "low"}` and the
+unchanged 2,048 completion-token cap, JSON mode, required-parameter enforcement,
+and disabled provider fallback. Requested/returned identity was exactly
+`openai/gpt-oss-20b`; generation ID `gen-1792532082-XtR4dFvgN8nSjObllGnH`.
+Packet SHA-256:
+`50d5af19ee52fb498b546a6bd813ee0482ed144781b85bc5dc4f1119aae4f9c8`.
+
+The response was HTTP 200 with final JSON and `finish_reason: stop`, after
+50.948 seconds. Reported usage: **10,306 prompt, 760 completion, 11,066 total
+tokens**, including **333 reasoning tokens**. This observed output stayed under
+the cap; it does not establish that all future low-effort calls will succeed.
+
+Ticket validation failed because the required `uncertainties` field was missing.
+Offline inspection also found a reference ending at line **4,842** in
+`castle/room_tools.py`, which has **125 lines** and **4,842 bytes**. The citation
+is invalid regardless of the other missing field. The proposal also needs
+substantive review: existing `read_room` already catches read-time `OSError`,
+and an existence precheck would neither cover permission failure nor eliminate
+the disappearance race. No fields/references were repaired and no replacement
+ticket was generated. No validated worker artifact, reviewer call/verdict,
+Z export, human acceptance, or artifact-bound decision command exists.
+
+Provider-reported cost for this attempt: **$0.000253908**. Combined with the
+first failed attempt's **$0.000369954**, the preserved cumulative charge is
+**$0.000623862** across two attempts. Accounting is complete; cost per accepted
+result remains unavailable. Raw run artifacts remain outside Git, and the
+original attempt's files are byte-identical. No retry, ledger repair/reset,
+parameter change, or further provider call followed this failure.
+
+**Next safe check:** review output-contract/citation guidance offline.
+**Spec-change proposal only, not implemented:** consider supplying explicit
+per-source line counts and clearer required-field guidance before another
+separately authorized experiment. Do not automatically fill missing fields,
+clip citations, weaken validation, or treat valid JSON as a valid ticket.
+Mark remains merge/human-acceptance gate; Meraki remains architecture reviewer.
+
+## First funded live attempt — 2026-10-20 UTC
 
 After Mark independently funded the account, read-only preflight at
 `2026-10-20T21:00:27Z` confirmed usable credit, the existing key allowance,
@@ -288,6 +338,6 @@ estimate, run path, and the artifact-bound offline accept/reject commands.
 
 No worker or review artifact exists from the failed live attempt. Consequently
 there is no Z export or accept/reject command tied to a validated artifact. The
-funded-attempt section above supersedes the original credential/funding blockers
-and records the single used authorization. Preserve its charge and failure;
-do not run another copy in this or a different environment.
+funded-attempt sections above supersede the original credential/funding blockers
+and record both used authorizations. Preserve their charges and failures; do
+not run another copy in this or a different environment.
