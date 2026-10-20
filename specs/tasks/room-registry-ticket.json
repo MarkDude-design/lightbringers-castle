@@ -1,0 +1,31 @@
+{
+  "task": {
+    "task_id": "room-registry-error-ticket-v0",
+    "goal": "Propose one implementation ticket to make local room-registry read failures explicit and testable. Inspect the supplied sources; identify a concrete failure path and propose a bounded repair, or state why the evidence is insufficient. Do not apply changes.",
+    "acceptance_criteria": [
+      "Cite exact supplied source paths and inclusive line ranges supporting the problem.",
+      "Propose behavior and tests for an inaccessible or disappearing room registry without adding tools or widening filesystem access.",
+      "State remaining uncertainties; do not claim tests or proposed code were executed."
+    ],
+    "boundaries": [
+      "Proposal only. Never execute code, shell commands, or patches.",
+      "Preserve the talk runner's existing successful read_room behavior and CLI exit semantics.",
+      "No MCP, deployment, Puppy Linux integration, additional tools, or provider changes."
+    ],
+    "source_files": ["castle/room_tools.py", "tests/test_talk.py", "castle/TALK.md"],
+    "allowed_files": ["castle/room_tools.py", "tests/test_talk.py"]
+  },
+  "worker_model": "nvidia/nemotron-3.5-lightning:free",
+  "reviewer_model": "nvidia/nemotron-3.5-lightning:free",
+  "budget_usd": "0.01",
+  "allow_paid": false,
+  "max_completion_tokens": 1200,
+  "pricing": {
+    "nvidia/nemotron-3.5-lightning:free": {
+      "observed_on": "2026-10-19",
+      "source": "Historical :free route observation: Mark's Castle room acceptance JSONL reported zero cost on both calls. Not a refreshed catalog quote or availability certification. Refresh deliberately before use if stale.",
+      "input_usd_per_million": "0",
+      "output_usd_per_million": "0"
+    }
+  }
+}

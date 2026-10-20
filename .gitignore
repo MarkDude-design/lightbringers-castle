@@ -23,6 +23,7 @@ build/
 
 # Local conversation transcripts and Python cache
 .talk-runs/
+.task-runs/
 __pycache__/
 *.pyc
 
