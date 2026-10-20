@@ -24,6 +24,7 @@ build/
 # Local conversation transcripts and Python cache
 .talk-runs/
 .task-runs/
+.verification/
 __pycache__/
 *.pyc
 

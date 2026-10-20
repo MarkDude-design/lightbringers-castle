@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 import importlib.metadata
 import importlib.util
 import json
+import os
 from pathlib import Path
 import platform
 import re
@@ -13,6 +14,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import uuid
 
@@ -57,8 +59,33 @@ def temporary_file():
     return {'value':state, 'error':state['cleanup_error']}
 
 
+def _child_environment():
+    # Never inherit credentials, proxies, or PATH. Windows requires SystemRoot
+    # for process startup; an empty environment fails on Python 3.10 there.
+    if platform.system()=='Windows':
+        root=os.environ.get('SystemRoot')
+        if not root:
+            raise RuntimeError('Windows child requires SystemRoot')
+        return {'SystemRoot':root}
+    return {}
+
+
+def _await_child_ready(proc, ready):
+    deadline=time.monotonic()+5
+    while True:
+        remaining=deadline-time.monotonic()
+        if remaining<=0:
+            raise TimeoutError('Child did not emit readiness within 5 seconds')
+        if ready.wait(min(0.05,remaining)):
+            if proc.poll() is not None:
+                raise RuntimeError('Child exited before termination probe')
+            return
+        if proc.poll() is not None:
+            raise RuntimeError('Child exited before termination probe')
+
+
 def child_probe(terminate=False):
-    """Launch only fixed Python code; pass an empty child environment."""
+    """Launch fixed Python code with no inherited application credentials."""
     code="print('runtime-probe-child-ready', flush=True)"
     if terminate:code += '; import time; time.sleep(30)'
     proc=None
@@ -66,34 +93,43 @@ def child_probe(terminate=False):
            'terminate_sent':False, 'kill_fallback':False, 'returncode':None,
            'reaped':False, 'cleanup_error':None}
     failure=None
+    ready=threading.Event()
+    outputs={'stdout':[], 'stderr':[]}
+    readers=[]
+    reader_errors=[]
+
+    def read_stream(name, stream):
+        # Each pipe has one reader. communicate() timeout output is not a
+        # portable readiness signal (Windows may not expose it until EOF).
+        try:
+            for line in iter(stream.readline,''):
+                outputs[name].append(line)
+                if name=='stdout' and line.rstrip('\r\n')=='runtime-probe-child-ready':
+                    ready.set()
+        except Exception as exc:
+            reader_errors.append(error_info(exc))
+        finally:
+            stream.close()
+
     try:
         proc=subprocess.Popen([sys.executable,'-I','-u','-c',code],
                               stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,
-                              stderr=subprocess.PIPE,text=True,env={})
+                              stderr=subprocess.PIPE,text=True,env=_child_environment())
         value['launched']=True
+        for name in ('stdout','stderr'):
+            reader=threading.Thread(target=read_stream,
+                                    args=(name,getattr(proc,name)),daemon=True)
+            reader.start()
+            readers.append(reader)
         if terminate:
-            deadline=time.monotonic()+5
-            while True:
-                try:
-                    proc.communicate(timeout=0.1)
-                    raise RuntimeError('Child exited before termination probe')
-                except subprocess.TimeoutExpired as exc:
-                    partial=exc.output or b''
-                    if isinstance(partial,bytes):partial=partial.decode('utf-8',errors='replace')
-                    if 'runtime-probe-child-ready' in partial:break
-                    if time.monotonic()>=deadline:
-                        raise TimeoutError('Child did not emit readiness within 5 seconds')
+            _await_child_ready(proc,ready)
             proc.terminate();value['terminate_sent']=True
-            try:out,err=proc.communicate(timeout=2)
+            try:proc.wait(timeout=2)
             except subprocess.TimeoutExpired:
                 proc.kill();value['kill_fallback']=True
-                out,err=proc.communicate(timeout=2)
+                proc.wait(timeout=2)
         else:
-            out,err=proc.communicate(timeout=5)
-        value.update(stdout=out,stderr=err,returncode=proc.returncode,reaped=True,
-                     output_received='runtime-probe-child-ready' in out)
-        if not value['output_received']:raise RuntimeError('Expected child output missing')
-        if not terminate and proc.returncode!=0:raise RuntimeError('Child returned nonzero status')
+            proc.wait(timeout=5)
     except Exception as exc:
         failure=error_info(exc)
     finally:
@@ -101,10 +137,24 @@ def child_probe(terminate=False):
             try:
                 if proc.poll() is None:
                     proc.kill();value['kill_fallback']=True
-                out,err=proc.communicate(timeout=2)
-                value.update(stdout=out,stderr=err,returncode=proc.returncode,reaped=True)
+                proc.wait(timeout=2)
+                value.update(returncode=proc.returncode,reaped=True)
             except Exception as exc:
                 value['cleanup_error']=error_info(exc)
+            for reader in readers:
+                reader.join(timeout=2)
+            if any(reader.is_alive() for reader in readers):
+                value['cleanup_error']=value['cleanup_error'] or error_info(
+                    TimeoutError('Child output reader did not finish within 2 seconds'))
+            value.update(stdout=''.join(outputs['stdout']),stderr=''.join(outputs['stderr']),
+                         output_received=ready.is_set())
+            if reader_errors:
+                value['cleanup_error']=value['cleanup_error'] or reader_errors[0]
+    if failure is None and value['cleanup_error'] is None:
+        if not value['output_received']:
+            failure=error_info(RuntimeError('Expected child output missing'))
+        elif not terminate and value['returncode']!=0:
+            failure=error_info(RuntimeError('Child returned nonzero status'))
     return {'value':value,'error':failure or value['cleanup_error']}
 
 

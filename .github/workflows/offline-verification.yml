@@ -1,0 +1,57 @@
+name: Offline verification
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.10', '3.12']
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        if: ${{ always() }}
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v4
+        if: ${{ always() }}
+        with:
+          node-version: '24'
+      - name: Enable Windows symlink fixtures
+        if: ${{ always() && runner.os == 'Windows' }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $key = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock'
+          New-Item -Path $key -Force | Out-Null
+          New-ItemProperty -Path $key -Name AllowDevelopmentWithoutDevLicense -Value 1 -PropertyType DWord -Force | Out-Null
+      - name: Run shared offline verification
+        if: ${{ always() }}
+        shell: bash
+        env:
+          VERIFY_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: python scripts/verify.py --base "$VERIFY_BASE" --output .verification/ci
+      - name: Preserve verifier evidence, including failures
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: offline-${{ matrix.os }}-py${{ matrix.python }}
+          path: |
+            .verification/ci/summary.json
+            .verification/ci/*.log
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7

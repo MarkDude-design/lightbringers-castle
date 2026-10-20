@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import runtime_probe as probe
@@ -32,6 +32,83 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(result['error']['type'],'PermissionError')
         self.assertEqual(result['error']['errno'],13)
         self.assertFalse(result['value']['launched'])
+
+    def test_child_environment_contains_only_required_system_variable(self):
+        synthetic={'SystemRoot':r'C:\Windows', 'OPENROUTER_API_KEY':'synthetic-key',
+                   'GH_TOKEN':'synthetic-token', 'HTTPS_PROXY':'synthetic-proxy',
+                   'PATH':'synthetic-path'}
+        with patch.dict(probe.os.environ,synthetic,clear=True):
+            for system,expected in [('Windows',{'SystemRoot':r'C:\Windows'}),
+                                    ('Linux',{})]:
+                with self.subTest(system=system),patch.object(probe.platform,'system',return_value=system):
+                    self.assertEqual(probe._child_environment(),expected)
+
+    def test_missing_windows_system_root_fails_before_launch(self):
+        with patch.dict(probe.os.environ,{},clear=True),\
+             patch.object(probe.platform,'system',return_value='Windows'),\
+             patch.object(probe.subprocess,'Popen') as launch:
+            result=probe.child_probe()
+        launch.assert_not_called()
+        self.assertEqual(result['error']['type'],'RuntimeError')
+        self.assertEqual(result['error']['message'],'Windows child requires SystemRoot')
+        self.assertFalse(result['value']['launched'])
+
+    def test_termination_does_not_depend_on_communicate_timeout_output(self):
+        original=probe.subprocess.Popen
+        def launch(*args,**kwargs):
+            proc=original(*args,**kwargs)
+            proc.communicate=Mock(side_effect=AssertionError('No partial-output dependency'))
+            return proc
+        with patch.object(probe.subprocess,'Popen',side_effect=launch):
+            result=probe.child_probe(True)
+        self.assertIsNone(result['error'],result)
+        self.assertTrue(result['value']['terminate_sent'])
+        self.assertTrue(result['value']['output_received'])
+        self.assertTrue(result['value']['reaped'])
+        self.assertFalse(result['value']['kill_fallback'])
+
+    def test_readiness_timeout_preserves_error_and_reaps_child(self):
+        with patch.object(probe,'_await_child_ready',
+                          side_effect=TimeoutError('fixture readiness timeout')):
+            result=probe.child_probe(True)
+        self.assertEqual(result['error']['type'],'TimeoutError')
+        self.assertEqual(result['error']['message'],'fixture readiness timeout')
+        self.assertTrue(result['value']['kill_fallback'])
+        self.assertTrue(result['value']['reaped'])
+        self.assertFalse(result['value']['terminate_sent'])
+        self.assertIsNone(result['value']['cleanup_error'])
+
+    def test_termination_timeout_kills_and_reaps_child(self):
+        original=probe.subprocess.Popen
+        def launch(*args,**kwargs):
+            proc=original(*args,**kwargs)
+            wait=proc.wait
+            proc.terminate=Mock()  # Simulate a child that ignores termination.
+            # Subsequent waits must actually reap the killed process.
+            first=True
+            def wait_once(timeout=None):
+                nonlocal first
+                if first:
+                    first=False
+                    raise probe.subprocess.TimeoutExpired(args[0],timeout)
+                return wait(timeout=timeout)
+            proc.wait=Mock(side_effect=wait_once)
+            return proc
+        with patch.object(probe.subprocess,'Popen',side_effect=launch):
+            result=probe.child_probe(True)
+        self.assertIsNone(result['error'],result)
+        self.assertTrue(result['value']['terminate_sent'])
+        self.assertTrue(result['value']['kill_fallback'])
+        self.assertTrue(result['value']['output_received'])
+        self.assertTrue(result['value']['reaped'])
+        self.assertIsNotNone(result['value']['returncode'])
+
+    def test_early_child_exit_is_not_readiness(self):
+        proc=Mock()
+        proc.poll.return_value=0
+        ready=probe.threading.Event()
+        with self.assertRaisesRegex(RuntimeError,'Child exited before termination probe'):
+            probe._await_child_ready(proc,ready)
 
     def test_failed_check_does_not_erase_other_results(self):
         log=io.StringIO()

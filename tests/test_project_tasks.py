@@ -1,5 +1,6 @@
 """Offline transactions exercise real packet/artifact/accounting boundaries."""
 import copy
+import hashlib
 from datetime import datetime, timedelta, timezone
 import io
 import json
@@ -19,7 +20,9 @@ class ProjectTaskTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.repo = Path(self.temporary.name)
         (self.repo / 'castle').mkdir()
-        (self.repo / 'castle/example.py').write_text('def greet():\n    return "hello"\n')
+        # The fixture has explicit LF bytes on every host; production packets
+        # must continue hashing source bytes exactly as they exist on disk.
+        (self.repo / 'castle/example.py').write_bytes(b'def greet():\n    return "hello"\n')
         self.config = {
             'task': {'task_id': 'fixture-task', 'goal': 'Propose a bounded greeting fix.',
                      'acceptance_criteria': ['Preserve the public function name.'],
@@ -248,6 +251,17 @@ class ProjectTaskTests(unittest.TestCase):
         (self.repo / 'castle/example.py').write_text('changed\n')
         self.assertNotEqual(tasks.digest(self.packet), tasks.digest(self.freeze()))
         self.assertEqual(self.packet['sources'][0]['content'], 'def greet():\n    return "hello"\n')
+
+    def test_frozen_sources_preserve_crlf_bytes(self):
+        raw = b'def greet():\r\n    return "hello"\r\n'
+        (self.repo / 'castle/example.py').write_bytes(raw)
+        frozen = self.freeze()
+        source = frozen['sources'][0]
+        self.assertEqual(source['content'], raw.decode('utf-8'))
+        self.assertEqual(source['byte_length'], len(raw))
+        self.assertEqual(source['sha256'], hashlib.sha256(raw).hexdigest())
+        self.assertNotEqual(source['sha256'], self.packet['sources'][0]['sha256'])
+        self.assertNotEqual(tasks.digest(frozen), tasks.digest(self.packet))
 
     def test_path_boundaries_block_escape_secret_files_symlinks_and_sizes(self):
         outside = self.repo.parent / ('outside-' + self.repo.name + '.txt')
