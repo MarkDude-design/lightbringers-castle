@@ -1,0 +1,39 @@
+{
+  "task": {
+    "task_id": "room-registry-error-ticket-v0",
+    "goal": "Propose one implementation ticket to make local room-registry read failures explicit and testable. Inspect the supplied sources; identify a concrete failure path and propose a bounded repair, or state why the evidence is insufficient. Do not apply changes.",
+    "acceptance_criteria": [
+      "Cite exact supplied source paths and inclusive line ranges supporting the problem.",
+      "Propose behavior and tests for an inaccessible or disappearing room registry without adding tools or widening filesystem access.",
+      "State remaining uncertainties; do not claim tests or proposed code were executed."
+    ],
+    "boundaries": [
+      "Proposal only. Never execute code, shell commands, or patches.",
+      "Preserve the talk runner's existing successful read_room behavior and CLI exit semantics.",
+      "No MCP, deployment, Puppy Linux integration, additional tools, or provider changes."
+    ],
+    "source_files": [
+      "castle/room_tools.py",
+      "tests/test_talk.py",
+      "castle/TALK.md"
+    ],
+    "allowed_files": [
+      "castle/room_tools.py",
+      "tests/test_talk.py"
+    ]
+  },
+  "worker_model": "openai/gpt-oss-20b",
+  "reviewer_model": "openai/gpt-oss-20b",
+  "budget_usd": "0.05",
+  "allow_paid": true,
+  "max_completion_tokens": 2048,
+  "pricing": {
+    "openai/gpt-oss-20b": {
+      "observed_on": "2026-10-20",
+      "source": "https://openrouter.ai/api/v1/models/openai/gpt-oss-20b/endpoints; component-wise maximum across all nine endpoints advertising response_format/max_tokens, including status -2; refreshed observation: docs/evidence/room-registry-endpoint-preflight-20261020-followup.json. Advertised compatibility only, not live qualification.",
+      "input_usd_per_million": "0.075",
+      "output_usd_per_million": "0.3"
+    }
+  },
+  "reasoning_effort": "low"
+}

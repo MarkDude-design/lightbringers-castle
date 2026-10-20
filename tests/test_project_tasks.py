@@ -2,6 +2,7 @@
 import copy
 import hashlib
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 import io
 import json
 from pathlib import Path
@@ -72,6 +73,20 @@ class ProjectTaskTests(unittest.TestCase):
         with patch.object(tasks.talk, 'complete', side_effect=provider or self.provider):
             return tasks.run_task(self.repo, self.config, self.packet, 'fixture-private-key')
 
+    def capped_provider(self, *args):
+        # Synthetic completion-cap failure, not a copied live response.
+        result = self.provider(*args)
+        result.update(status='error', text=None, message=None, finish_reason='length',
+                      error={'type': 'ValueError', 'message': 'No final content'},
+                      usage={'prompt_tokens': 100, 'completion_tokens': 2048,
+                             'total_tokens': 2148, 'cost': '0.000369954',
+                             'completion_tokens_details': {'reasoning_tokens': 2045}})
+        result['raw'] = {'id': result['inference_id'], 'model': result['returned_model'],
+                         'choices': [{'finish_reason': 'length',
+                                      'message': {'role': 'assistant', 'content': ''}}],
+                         'usage': result['usage']}
+        return result
+
     def load(self, result):
         run = tasks.find_run(self.repo, result['run'])
         manifest, receipt = tasks.read_run(run)
@@ -112,6 +127,127 @@ class ProjectTaskTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'positive'):
                 self.run_task()
         transport.assert_not_called()
+
+    def test_omitted_reasoning_keeps_legacy_requests_and_plan(self):
+        plan = tasks.plan(self.config, self.packet)
+        for role in ('worker', 'reviewer'):
+            self.assertNotIn('requested_reasoning_effort', plan['roles'][role])
+        result = self.run_task()
+        self.assertEqual(result['status'], 'reviewed')
+        for request in self.requests:
+            self.assertEqual(set(request), {'model', 'messages', 'stream', 'max_tokens',
+                                            'response_format', 'provider'})
+
+    def test_low_reasoning_is_shown_offline_and_durable_before_both_calls(self):
+        self.config.update(reasoning_effort='low', max_completion_tokens=2048)
+        config = self.repo / 'config.json'
+        config.write_text(json.dumps(self.config))
+        with patch.object(tasks, 'REPO', self.repo), \
+                patch.object(tasks, 'base_commit', return_value='a' * 40), \
+                patch.object(tasks.talk, 'obtain_key', side_effect=AssertionError('No key prompt')), \
+                patch.object(tasks.talk, 'complete', side_effect=AssertionError('No inference')), \
+                patch('sys.stdout', new=io.StringIO()) as output:
+            self.assertEqual(tasks.main(['dry-run', '--config', str(config)]), 0)
+            plan = json.loads(output.getvalue())
+        self.assertFalse(tasks.runs_root(self.repo).exists())
+        for role in ('worker', 'reviewer'):
+            self.assertEqual(plan['roles'][role]['requested_reasoning_effort'], 'low')
+
+        def inspect_durable_request(*args):
+            run = next(path for path in (tasks.runs_root(self.repo) / 'fixture-task').iterdir()
+                       if path.is_dir())
+            _, receipt = tasks.read_run(run)
+            self.assertEqual(receipt['status'], 'in_flight')
+            self.assertEqual(receipt['calls'][-1]['request'], args[2])
+            return self.provider(*args)
+
+        result = self.run_task(inspect_durable_request)
+        run, _, receipt = self.load(result)
+        self.assertEqual(result['status'], 'reviewed')
+        self.assertEqual(len(self.requests), 2)
+        for request, call in zip(self.requests, receipt['calls']):
+            self.assertEqual(request['reasoning'], {'effort': 'low'})
+            self.assertEqual(call['request'], request)
+            self.assertEqual(request['max_tokens'], 2048)
+            self.assertEqual(request['response_format'], {'type': 'json_object'})
+            self.assertEqual(request['provider'], {'allow_fallbacks': False, 'require_parameters': True})
+            self.assertNotIn('reasoning_effort', request)
+        self.assertEqual(json.loads((run / 'plan.json').read_text())['roles'], plan['roles'])
+        self.assertEqual(tasks.digest(self.packet), result['packet_sha256'])
+        self.assertEqual(receipt['human_acceptance'], 'not_recorded')
+
+    def test_invalid_reasoning_opt_ins_are_rejected_before_transport(self):
+        for value in (None, '', False, True, 0, [], {}, 'LOW', 'medium', 'high', 'none'):
+            with self.subTest(value=value):
+                config = copy.deepcopy(self.config)
+                config['reasoning_effort'] = value
+                with patch.object(tasks.talk, 'complete') as transport:
+                    with self.assertRaisesRegex(ValueError, 'reasoning_effort'):
+                        tasks.run_task(self.repo, config, self.packet, 'fixture-private-key')
+                transport.assert_not_called()
+        config = dict(self.config, reasoning={'effort': 'low', 'exclude': True})
+        with self.assertRaisesRegex(ValueError, 'fields'):
+            tasks.validate_config(config)
+        self.assertFalse(tasks.runs_root(self.repo).exists())
+
+    def test_low_reasoning_cap_failure_is_charged_without_retry_or_review(self):
+        self.config.update(reasoning_effort='low', max_completion_tokens=2048)
+        result = self.run_task(self.capped_provider)
+        _, manifest, receipt = self.load(result)
+        self.assertEqual(len(self.requests), 1)
+        self.assertEqual(result['status'], 'failed')
+        self.assertEqual(result['report']['total_recorded_spend_usd'], '0.000369954')
+        self.assertTrue(result['report']['accounting_complete'])
+        self.assertFalse(receipt['schema_valid'])
+        self.assertNotIn('worker.json', manifest['files'])
+        self.assertIsNone(receipt['reviewer_verdict'])
+        call = receipt['calls'][0]
+        self.assertEqual(call['request']['reasoning'], {'effort': 'low'})
+        self.assertEqual(call['response']['raw']['choices'][0]['finish_reason'], 'length')
+        self.assertEqual(call['usage']['completion_tokens_details']['reasoning_tokens'], 2045)
+
+    def test_reasoning_opt_in_keeps_prior_failed_charge_and_budget_gate(self):
+        self.config.update(budget_usd='0.05', max_completion_tokens=2048)
+        for price in self.config['pricing'].values():
+            price.update(input_usd_per_million='0.075', output_usd_per_million='0.3')
+        result = self.run_task(self.capped_provider)
+        run, _, _ = self.load(result)
+        original = {path.name: path.read_bytes() for path in run.iterdir()}
+        self.config['reasoning_effort'] = 'low'
+        prior = tasks.report(self.repo, self.packet['task_id'])
+        plan = tasks.plan(self.config, self.packet, prior)
+        self.assertTrue(plan['can_run'])
+        self.assertEqual(plan['prior_task_accounting']['total_recorded_spend_usd'], '0.000369954')
+        # Reserve exactly the new estimate: it only fits if the old charge is lost.
+        self.config['budget_usd'] = plan['estimated_total_usd']
+        self.assertGreater(Decimal(plan['estimated_total_usd']) + Decimal('0.000369954'),
+                           Decimal(self.config['budget_usd']))
+        self.assertFalse(tasks.plan(self.config, self.packet, prior)['can_run'])
+        with patch.object(tasks.talk, 'complete') as transport:
+            with self.assertRaisesRegex(ValueError, 'budget'):
+                tasks.run_task(self.repo, self.config, self.packet, 'fixture-private-key')
+        transport.assert_not_called()
+        self.assertEqual(tasks.report(self.repo, self.packet['task_id'])['attempts'], 1)
+        self.assertEqual({path.name: path.read_bytes() for path in run.iterdir()}, original)
+
+    def test_unsupported_reasoning_response_stops_without_fallback_or_retry(self):
+        self.config['reasoning_effort'] = 'low'
+        def unsupported(*args):
+            result = self.provider(*args)
+            result.update(status='error', usage=None,
+                          error={'type': 'HTTPError', 'message': 'Unsupported reasoning parameter'},
+                          raw={'error': {'code': 400, 'message': 'Unsupported reasoning parameter'}})
+            return result
+        result = self.run_task(unsupported)
+        _, _, receipt = self.load(result)
+        self.assertEqual(result['status'], 'failed')
+        self.assertEqual(len(self.requests), 1)
+        self.assertEqual(receipt['calls'][0]['request']['reasoning'], {'effort': 'low'})
+        self.assertFalse(result['report']['accounting_complete'])
+        self.assertEqual(receipt['calls'][0]['response']['raw']['error']['code'], 400)
+        with self.assertRaisesRegex(ValueError, 'Prior attempt accounting'):
+            self.run_task()
+        self.assertEqual(len(self.requests), 1)
 
     def test_budget_exhaustion_stops_after_worker_and_counts_reported_charge(self):
         self.config['budget_usd'] = '0.0005'

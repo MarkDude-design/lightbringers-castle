@@ -1,0 +1,156 @@
+{
+  "schema_version": "castle-reasoning-support-observation/0.1",
+  "requested_model": "openai/gpt-oss-20b",
+  "source_url": "https://openrouter.ai/api/v1/models/openai/gpt-oss-20b/endpoints",
+  "observed_at_utc": "2026-10-20T21:17:52.030703+00:00",
+  "raw_response_sha256": "8cc59be2d78a471c0855a99f54524842b3137feb38193466b7ba69aa5d5e7eb4",
+  "retrieval": "Selected public model-endpoint metadata normalized from a read-only HTTPS GET; not a byte-identical response capture.",
+  "requested_reasoning": {
+    "effort": "low"
+  },
+  "required_parameters": [
+    "max_tokens",
+    "reasoning",
+    "response_format"
+  ],
+  "max_completion_tokens": 2048,
+  "endpoints": [
+    {
+      "provider": "Darkbloom",
+      "tag": "darkbloom/fp8",
+      "status": 0,
+      "max_completion_tokens": 32768,
+      "advertised_required_parameters": [
+        "max_tokens",
+        "reasoning",
+        "response_format"
+      ],
+      "compatible_parameter_advertisement": true
+    },
+    {
+      "provider": "AkashML",
+      "tag": "akashml/fp4",
+      "status": 0,
+      "max_completion_tokens": 117964,
+      "advertised_required_parameters": [
+        "max_tokens",
+        "reasoning",
+        "response_format"
+      ],
+      "compatible_parameter_advertisement": true
+    },
+    {
+      "provider": "DekaLLM",
+      "tag": "dekallm/bf16",
+      "status": 0,
+      "max_completion_tokens": 117964,
+      "advertised_required_parameters": [
+        "max_tokens",
+        "reasoning",
+        "response_format"
+      ],
+      "compatible_parameter_advertisement": true
+    },
+    {
+      "provider": "CoreWeave",
+      "tag": "coreweave/fp4",
+      "status": 0,
+      "max_completion_tokens": 117964,
+      "advertised_required_parameters": [
+        "max_tokens",
+        "reasoning",
+        "response_format"
+      ],
+      "compatible_parameter_advertisement": true
+    },
+    {
+      "provider": "DeepInfra",
+      "tag": "deepinfra/bf16",
+      "status": 0,
+      "max_completion_tokens": 117964,
+      "advertised_required_parameters": [
+        "max_tokens",
+        "reasoning",
+        "response_format"
+      ],
+      "compatible_parameter_advertisement": true
+    },
+    {
+      "provider": "Parasail",
+      "tag": "parasail/fp4",
+      "status": 0,
+      "max_completion_tokens": 117964,
+      "advertised_required_parameters": [
+        "max_tokens",
+        "reasoning",
+        "response_format"
+      ],
+      "compatible_parameter_advertisement": true
+    },
+    {
+      "provider": "SiliconFlow",
+      "tag": "siliconflow/fp8",
+      "status": -2,
+      "max_completion_tokens": 8192,
+      "advertised_required_parameters": [
+        "max_tokens",
+        "reasoning",
+        "response_format"
+      ],
+      "compatible_parameter_advertisement": true
+    },
+    {
+      "provider": "Amazon Bedrock",
+      "tag": "amazon-bedrock/eu-west-1",
+      "status": 0,
+      "max_completion_tokens": 117964,
+      "advertised_required_parameters": [
+        "max_tokens",
+        "reasoning"
+      ],
+      "compatible_parameter_advertisement": false
+    },
+    {
+      "provider": "Amazon Bedrock",
+      "tag": "amazon-bedrock",
+      "status": 0,
+      "max_completion_tokens": 117964,
+      "advertised_required_parameters": [
+        "max_tokens",
+        "reasoning"
+      ],
+      "compatible_parameter_advertisement": false
+    },
+    {
+      "provider": "Google",
+      "tag": "google-vertex/us-central1",
+      "status": 0,
+      "max_completion_tokens": 32768,
+      "advertised_required_parameters": [
+        "max_tokens",
+        "reasoning",
+        "response_format"
+      ],
+      "compatible_parameter_advertisement": true
+    },
+    {
+      "provider": "Groq",
+      "tag": "groq",
+      "status": 0,
+      "max_completion_tokens": 65536,
+      "advertised_required_parameters": [
+        "max_tokens",
+        "reasoning",
+        "response_format"
+      ],
+      "compatible_parameter_advertisement": true
+    }
+  ],
+  "limitations": [
+    "Endpoint metadata advertises parameter names, not reasoning-effort enum values or successful live behavior.",
+    "OpenRouter reasoning guide describes effort=low; guide supplied during architecture review; independent .md page retrieval returned HTTP 403.",
+    "Required-parameter enforcement remains enabled, and provider fallback disabled. Refresh support and admission before any separately authorized live attempt.",
+    "Existing dated pricing was not refreshed or relabeled for this offline change."
+  ],
+  "inference_requests_made": 0
+}
