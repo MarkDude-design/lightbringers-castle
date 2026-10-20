@@ -1,0 +1,310 @@
+{
+  "model": "openai/gpt-oss-20b",
+  "source_url": "https://openrouter.ai/api/v1/models/openai/gpt-oss-20b/endpoints",
+  "eligible": [
+    {
+      "name": "Darkbloom | openai/gpt-oss-20b",
+      "provider": "Darkbloom",
+      "tag": "darkbloom/fp8",
+      "status": 0,
+      "context_length": 131072,
+      "max_completion_tokens": 32768,
+      "pricing": {
+        "prompt": "0.000000018",
+        "completion": "0.00000009",
+        "input_cache_read": "0.000000009",
+        "discount": 0
+      },
+      "supported_parameters": [
+        "reasoning",
+        "include_reasoning",
+        "temperature",
+        "top_p",
+        "top_k",
+        "frequency_penalty",
+        "presence_penalty",
+        "repetition_penalty",
+        "stop",
+        "seed",
+        "max_tokens",
+        "response_format",
+        "structured_outputs",
+        "tools",
+        "tool_choice",
+        "logprobs",
+        "top_logprobs",
+        "reasoning_effort"
+      ]
+    },
+    {
+      "name": "AkashML | openai/gpt-oss-20b",
+      "provider": "AkashML",
+      "tag": "akashml/fp4",
+      "status": 0,
+      "context_length": 131072,
+      "max_completion_tokens": 117964,
+      "pricing": {
+        "prompt": "0.00000002",
+        "completion": "0.0000001",
+        "discount": 0
+      },
+      "supported_parameters": [
+        "reasoning",
+        "include_reasoning",
+        "temperature",
+        "top_p",
+        "top_k",
+        "stop",
+        "seed",
+        "frequency_penalty",
+        "presence_penalty",
+        "repetition_penalty",
+        "max_tokens",
+        "structured_outputs",
+        "response_format",
+        "tools",
+        "tool_choice",
+        "logprobs",
+        "top_logprobs",
+        "reasoning_effort"
+      ]
+    },
+    {
+      "name": "DekaLLM | openai/gpt-oss-20b",
+      "provider": "DekaLLM",
+      "tag": "dekallm/bf16",
+      "status": 0,
+      "context_length": 131072,
+      "max_completion_tokens": 117964,
+      "pricing": {
+        "prompt": "0.000000029",
+        "completion": "0.00000014",
+        "input_cache_read": "0.000000029",
+        "discount": 0
+      },
+      "supported_parameters": [
+        "reasoning",
+        "include_reasoning",
+        "frequency_penalty",
+        "logit_bias",
+        "max_tokens",
+        "presence_penalty",
+        "seed",
+        "stop",
+        "temperature",
+        "top_p",
+        "response_format",
+        "structured_outputs",
+        "tools",
+        "tool_choice",
+        "logprobs",
+        "top_logprobs",
+        "reasoning_effort"
+      ]
+    },
+    {
+      "name": "CoreWeave | openai/gpt-oss-20b",
+      "provider": "CoreWeave",
+      "tag": "coreweave/fp4",
+      "status": 0,
+      "context_length": 131072,
+      "max_completion_tokens": 117964,
+      "pricing": {
+        "prompt": "0.00000003",
+        "completion": "0.00000013",
+        "input_cache_read": "0.00000003",
+        "discount": 0
+      },
+      "supported_parameters": [
+        "reasoning",
+        "include_reasoning",
+        "structured_outputs",
+        "response_format",
+        "max_tokens",
+        "temperature",
+        "top_p",
+        "top_k",
+        "repetition_penalty",
+        "frequency_penalty",
+        "presence_penalty",
+        "stop",
+        "seed",
+        "tools",
+        "tool_choice",
+        "logprobs",
+        "top_logprobs",
+        "reasoning_effort"
+      ]
+    },
+    {
+      "name": "DeepInfra | openai/gpt-oss-20b",
+      "provider": "DeepInfra",
+      "tag": "deepinfra/bf16",
+      "status": 0,
+      "context_length": 131072,
+      "max_completion_tokens": 117964,
+      "pricing": {
+        "prompt": "0.00000003",
+        "completion": "0.00000014",
+        "discount": 0
+      },
+      "supported_parameters": [
+        "reasoning",
+        "include_reasoning",
+        "max_tokens",
+        "temperature",
+        "top_p",
+        "stop",
+        "frequency_penalty",
+        "presence_penalty",
+        "repetition_penalty",
+        "top_k",
+        "seed",
+        "min_p",
+        "tools",
+        "tool_choice",
+        "structured_outputs",
+        "logit_bias",
+        "response_format",
+        "reasoning_effort"
+      ]
+    },
+    {
+      "name": "Parasail | openai/gpt-oss-20b",
+      "provider": "Parasail",
+      "tag": "parasail/fp4",
+      "status": 0,
+      "context_length": 131072,
+      "max_completion_tokens": 117964,
+      "pricing": {
+        "prompt": "0.00000003",
+        "completion": "0.00000015",
+        "input_cache_read": "0.00000002",
+        "discount": 0
+      },
+      "supported_parameters": [
+        "reasoning",
+        "include_reasoning",
+        "max_tokens",
+        "temperature",
+        "top_p",
+        "frequency_penalty",
+        "presence_penalty",
+        "repetition_penalty",
+        "seed",
+        "stop",
+        "top_k",
+        "logit_bias",
+        "response_format",
+        "structured_outputs",
+        "tools",
+        "tool_choice",
+        "logprobs",
+        "top_logprobs",
+        "reasoning_effort"
+      ]
+    },
+    {
+      "name": "SiliconFlow | openai/gpt-oss-20b",
+      "provider": "SiliconFlow",
+      "tag": "siliconflow/fp8",
+      "status": 0,
+      "context_length": 131072,
+      "max_completion_tokens": 8192,
+      "pricing": {
+        "prompt": "0.00000004",
+        "completion": "0.00000018",
+        "discount": 0
+      },
+      "supported_parameters": [
+        "reasoning",
+        "include_reasoning",
+        "structured_outputs",
+        "response_format",
+        "temperature",
+        "top_p",
+        "top_k",
+        "frequency_penalty",
+        "max_tokens",
+        "reasoning_effort"
+      ]
+    },
+    {
+      "name": "Google | openai/gpt-oss-20b",
+      "provider": "Google",
+      "tag": "google-vertex/us-central1",
+      "status": 0,
+      "context_length": 131072,
+      "max_completion_tokens": 32768,
+      "pricing": {
+        "prompt": "0.00000007",
+        "completion": "0.00000025",
+        "discount": 0
+      },
+      "supported_parameters": [
+        "reasoning",
+        "include_reasoning",
+        "structured_outputs",
+        "response_format",
+        "max_tokens",
+        "temperature",
+        "top_p",
+        "seed",
+        "repetition_penalty",
+        "top_k",
+        "reasoning_effort"
+      ]
+    },
+    {
+      "name": "Groq | openai/gpt-oss-20b",
+      "provider": "Groq",
+      "tag": "groq",
+      "status": 0,
+      "context_length": 131072,
+      "max_completion_tokens": 65536,
+      "pricing": {
+        "prompt": "0.000000075",
+        "completion": "0.0000003",
+        "input_cache_read": "0.0000000375",
+        "discount": 0
+      },
+      "supported_parameters": [
+        "reasoning",
+        "include_reasoning",
+        "max_tokens",
+        "temperature",
+        "top_p",
+        "stop",
+        "seed",
+        "response_format",
+        "tools",
+        "tool_choice",
+        "structured_outputs",
+        "reasoning_effort"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "name": "Amazon Bedrock | openai/gpt-oss-20b",
+      "reason": "response_format not advertised"
+    },
+    {
+      "name": "Amazon Bedrock | openai/gpt-oss-20b",
+      "reason": "response_format not advertised"
+    }
+  ],
+  "pricing_envelope": {
+    "input_usd_per_million": "0.075",
+    "output_usd_per_million": "0.3"
+  },
+  "schema_version": "castle-endpoint-observation/0.1",
+  "observed_at_utc": "2026-10-20T05:25:31.984934+00:00",
+  "retrieval": "Public metadata via research connection; selected fields normalized, not a byte-identical response capture",
+  "required_parameters": [
+    "response_format",
+    "max_tokens"
+  ],
+  "live_inference_verified": false,
+  "eligibility_note": "All nine included endpoints advertise response_format and max_tokens and list sufficient completion limits for 2048 tokens. OpenRouter documents json_object as JSON mode. This is advertised compatibility, not a live provider transaction."
+}
