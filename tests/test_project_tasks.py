@@ -1033,6 +1033,71 @@ class ProjectTaskTests(unittest.TestCase):
         self.assertIsNone(accepted['report']['cost_per_accepted_result_usd'])
         self.assertEqual(accepted['report']['ratio_reason'], 'Accounting incomplete')
 
+    def test_model_lane_rejects_over_cap_priced_models_before_transport(self):
+        config = copy.deepcopy(self.config)
+        config.update(model_lane='economy', allow_paid=True, budget_usd='0.05',
+                      worker_model='fixture/frontier')
+        config['pricing']['fixture/frontier'] = {
+            'observed_on': datetime.now(timezone.utc).date().isoformat(),
+            'source': 'Synthetic offline fixture, not a market quote',
+            'input_usd_per_million': '5', 'output_usd_per_million': '15'}
+        prepared = tasks.plan(config, self.packet)
+        self.assertFalse(prepared['can_run'])
+        self.assertEqual(prepared['blocked_reasons'],
+                         ['fixture/frontier exceeds the economy lane cap on input_usd_per_million; '
+                          'use a cheaper model or change the lane policy'])
+        self.assertEqual(prepared['roles']['worker']['model_lane'], 'economy')
+        with patch.object(tasks.talk, 'complete') as transport:
+            with self.assertRaisesRegex(ValueError, 'lane cap'):
+                tasks.run_task(self.repo, config, self.packet, 'fixture-private-key')
+        transport.assert_not_called()
+        self.assertFalse(tasks.runs_root(self.repo).exists())
+
+    def test_model_lane_allows_within_cap_pricing_and_records_lane(self):
+        config = copy.deepcopy(self.config)
+        config.update(model_lane='economy', allow_paid=True, budget_usd='0.05',
+                      worker_model='fixture/paid')
+        config['pricing']['fixture/paid'] = dict(
+            config['pricing']['fixture/worker:free'],
+            input_usd_per_million='0.075', output_usd_per_million='0.3')
+        prepared = tasks.plan(config, self.packet)
+        self.assertTrue(prepared['can_run'])
+        self.assertEqual(prepared['blocked_reasons'], [])
+        for role in ('worker', 'reviewer'):
+            self.assertEqual(prepared['roles'][role]['model_lane'], 'economy')
+            self.assertNotIn('z_lane_exemption', prepared['roles'][role])
+
+    def test_z_lane_exemption_is_dated_recorded_and_reenforces_after_expiry(self):
+        config = copy.deepcopy(self.config)
+        config.update(model_lane='economy', allow_paid=True, budget_usd='0.05',
+                      worker_model='mistralai/z-control')
+        config['pricing']['mistralai/z-control'] = {
+            'observed_on': datetime.now(timezone.utc).date().isoformat(),
+            'source': 'Synthetic offline fixture, not a market quote',
+            'input_usd_per_million': '5', 'output_usd_per_million': '15'}
+        future = datetime(2026, 12, 31, tzinfo=timezone.utc).date()
+        past = datetime(2026, 1, 1, tzinfo=timezone.utc).date()
+        with patch.object(tasks, 'Z_LANE_EXEMPT_UNTIL', future):
+            prepared = tasks.plan(config, self.packet)
+            self.assertTrue(prepared['can_run'])
+            self.assertEqual(prepared['roles']['worker']['z_lane_exemption'],
+                             'mistral-family model exempt through ' + future.isoformat())
+            self.assertNotIn('z_lane_exemption', prepared['roles']['reviewer'])
+        with patch.object(tasks, 'Z_LANE_EXEMPT_UNTIL', past):
+            prepared = tasks.plan(config, self.packet)
+            self.assertFalse(prepared['can_run'])
+            self.assertIn('economy lane cap', prepared['blocked_reasons'][0])
+            self.assertNotIn('z_lane_exemption', prepared['roles']['worker'])
+
+    def test_unknown_model_lane_is_rejected_with_named_lanes(self):
+        config = copy.deepcopy(self.config)
+        for name in ('premium', 'Economy', 'free'):
+            config['model_lane'] = name
+            with self.subTest(name=name):
+                with self.assertRaisesRegex(ValueError, 'named lane'):
+                    tasks.validate_config(config)
+
+
 
 if __name__ == '__main__':
     unittest.main()
