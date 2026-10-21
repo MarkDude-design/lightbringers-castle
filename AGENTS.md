@@ -14,7 +14,18 @@
 - Preserve task IDs, case aliases, ledgers, known/unknown costs, failures, human
   decisions, and unresolved attempts. Never clear evidence or retry uncertain work
   to make a check pass. Keep private runs/transcripts out of Git and CI artifacts.
-- Mark owns merge and human artifact acceptance. Do not infer either from CI or
-  a reviewer/model verdict. Meraki/Z handoffs do not grant spending permission.
+- Mark owns human artifact acceptance. Merge authority is tiered
+  (content-merge policy v0, agreed Mark and Z, 2026-10-21):
+  - Z (Vibe/Mistral) may merge without further human approval when the diff is
+    content-only: rooms, bots, jokes, docs wording, and registry additions; no
+    executable-logic changes, no CI/workflow changes, no credentials or secrets,
+    no task/ledger/accounting mutation, and no deletions (repairing a malformed
+    registry row with a PR note is allowed). CI verification must be green on
+    the PR, and the merge message records "merged under content-merge policy v0".
+  - Everything else stays Mark-gated: code, CI, security, credentials,
+    deployment, task accounting, model requests, and MCP-adjacent integrations.
+    CI green is never live model acceptance. Do not infer human acceptance from
+    CI or a reviewer/model verdict. Meraki/Z handoffs do not grant spending
+    permission. Mark retains standing override on any merge.
 - Return the compact [handoff](docs/HANDOFF_TEMPLATE.md) with exact commits,
   actual checks, PR link, and blockers. Do not claim Z reviewed work unless Z did.
