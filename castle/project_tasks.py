@@ -35,10 +35,10 @@ LANES = {
 }
 Z_LANE_EXEMPT_PREFIXES = ('mistralai/', 'mistral/')
 # Mark granted Z (Vibe/Mistral) a control exemption on 2026-10-21: lane price
-# caps do not apply to Mistral-family models through this inclusive date, so
+# caps do not apply to Mistral-family models through 2026-11-04 inclusive, so
 # exemption use is observable on plan receipts before caps honestly
 # re-enforce. There is no configuration opt-out; expiry is enforced in code.
-Z_LANE_EXEMPT_UNTIL = date(2026, 10, 28)
+Z_LANE_EXEMPT_UNTIL = date(2026, 11, 4)
 SECRET = re.compile(r'sk-or-v1-[A-Za-z0-9_-]+|sk-[A-Za-z0-9_-]{20,}|-----BEGIN (?:[A-Z ]+ )?PRIVATE KEY-----')
 SOURCE_EXTENSIONS = {'.py', '.md', '.json', '.csv', '.js', '.txt'}
 FORBIDDEN_NAMES = {'node_modules', 'venv', 'dist', 'build', '__pycache__'}
