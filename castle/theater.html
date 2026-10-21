@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'; form-action 'none'">
+  <meta name="description" content="Six strange rooms, a scripted cast, and a perfectly good metaphor waiting to go wrong.">
+  <title>Lightbringer’s Castle · A small theater</title>
+  <link rel="icon" type="image/svg+xml" href="theater-icon.svg">
+  <link rel="stylesheet" href="theater.css">
+  <script type="module" src="scripts/theater.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#performance">Skip to the stage</a>
+  <div class="page-shell">
+    <header class="masthead">
+      <a class="brand" href="theater.html" aria-label="Lightbringer’s Castle home">
+        <svg viewBox="0 0 36 40" aria-hidden="true"><path d="M4 15V6h6v6h5V2h6v10h5V6h6v30H4Z"/><path d="M14 36V26a4 4 0 0 1 8 0v10"/></svg>
+        <span>Lightbringer’s <strong>Castle</strong></span>
+      </a>
+      <div class="masthead-right"><span class="scripted-badge"><i></i> Scripted theater</span><button id="about-open" class="text-button" type="button">A note from the host <span class="arrow" aria-hidden="true"></span></button></div>
+    </header>
+
+    <main>
+      <section class="invitation" aria-labelledby="welcome-title">
+        <div><p class="eyebrow">THE DOORS ARE OPEN. THE LOGIC IS OPTIONAL.</p><h1 id="welcome-title">A small theater<br>for <em>big nonsense.</em></h1><p class="intro">Pick a room. Meet the cast. Let a perfectly good<br class="desktop-break"> metaphor get a little out of hand.</p></div>
+        <div class="invitation-note"><svg class="note-star" viewBox="0 0 70 70" aria-hidden="true"><path d="M35 4v62M4 35h62M13 13l44 44M13 57l44-44" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg><p>Come as you are.<br>Leave slightly<br><em>more curious.</em></p></div>
+      </section>
+
+      <div class="theater-layout">
+        <aside class="room-menu"><p class="eyebrow">CHOOSE YOUR DOOR</p><nav id="room-navigation" aria-label="Castle rooms"></nav><p class="small-note">Six rooms.<br>Absolutely no sensible ones.</p><span class="menu-flourish" aria-hidden="true">✧ — ✧</span></aside>
+
+        <section id="performance" tabindex="-1" aria-label="The performance" aria-busy="true">
+          <div id="stage-error" class="error-note" role="alert" hidden><p>This room’s curtain is stuck. Choose another door, or try this one again.</p><button id="retry-room" type="button">Try this room again</button></div>
+          <article id="stage" class="stage" data-room="courtyard" aria-labelledby="room-title">
+            <div class="stage-copy"><p id="act-label" class="eyebrow">RAISING THE CURTAIN</p><h2 id="room-title">A little anticipation…</h2><p id="room-description">The cast is finding its marks.</p><button id="scenery-cue" class="stage-button" type="button" disabled>Nudge the scenery <span class="arrow" aria-hidden="true"></span></button></div>
+            <svg class="stage-art" viewBox="0 0 460 370" aria-hidden="true">
+              <circle class="art-moon" cx="344" cy="62" r="26"/>
+              <g class="art-stars"><path d="m155 53 3 9 9 3-9 3-3 9-3-9-9-3 9-3Z"/><path d="m408 113 2 7 7 2-7 2-2 7-2-7-7-2 7-2Z"/><circle cx="254" cy="29" r="2"/><circle cx="379" cy="29" r="2"/><circle cx="108" cy="106" r="2"/></g>
+              <path class="art-shadow" d="M109 293V160a121 121 0 0 1 242 0v133Z"/>
+              <path class="art-arch" d="M98 300V159a132 132 0 0 1 264 0v141h-29V159a103 103 0 0 0-206 0v141Z"/>
+              <path class="art-outline" d="M113 297V159a117 117 0 0 1 234 0v138M98 171h29m-29 56h29m206-56h29m-29 56h29"/>
+              <path class="art-hills" d="M128 225q57-64 113-12t92-13v99H128Z"/>
+              <path class="art-floor" d="M42 303h380l31 40H12Z"/>
+              <ellipse class="art-water" cx="229" cy="304" rx="70" ry="17"/>
+              <path class="art-fountain" d="M195 249q34 16 68 0l-11 24h-14v20h-18v-20h-14Zm10-28q24 10 48 0l-8 17h-32Zm21-24h6v27h-6Z"/>
+              <path class="art-water-line" d="M229 192q-31 0-36 30m36-30q31 0 36 30m-36-30v-18"/>
+              <g class="art-plants"><path d="M74 308q-27-28-21-72 29 11 21 72m0-18q9-43 29-48 5 35-29 48M386 307q-14-51 7-73 18 40-7 73m0-12q-36-23-30-48 32 9 30 48"/><path d="M56 310h37l-7 27H63Zm309 0h38l-7 27h-24Z"/></g>
+              <path class="art-outline" d="M164 329h132m-99 11h60"/>
+            </svg>
+            <span id="stage-caption" class="stage-caption" aria-hidden="true">PLEASE METAPHOR RESPONSIBLY</span>
+          </article>
+
+          <div class="cue-strip" role="status" aria-live="polite" aria-atomic="true"><span class="cue-mark" aria-hidden="true">“</span><div><p id="cue-speaker" class="eyebrow">IN THE WINGS</p><p id="cue-line">A scene is on its way.</p></div></div>
+
+          <div class="playbill-grid">
+            <section class="cast-section" aria-labelledby="cast-heading"><div class="section-heading"><h3 id="cast-heading">Meet the cast</h3><span>Give someone a cue.</span></div><div id="cast-list" class="cast-list"></div><p id="cast-note" class="small-note" hidden>One cast member missed their entrance. The rest of the scene is ready.</p></section>
+            <section class="joke-card" aria-labelledby="joke-heading"><p class="eyebrow" id="joke-heading">A JOKE IN THE WINGS</p><p id="joke-setup" class="joke-setup">The punchline is warming up.</p><p id="joke-punchline" class="punchline" hidden></p><button id="joke-cue" class="text-button" type="button" disabled>Give me the punchline <span class="arrow" aria-hidden="true"></span></button></section>
+          </div>
+          <div class="cosmic-footer"><span><span aria-hidden="true">✧</span> Every scene could use a cosmic interruption.</span><button id="q-cue" class="text-button" type="button" disabled>Let Q interrupt <span class="arrow" aria-hidden="true"></span></button></div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="page-footer"><span>A little absurdity. A little company.</span><span>Lightbringer’s Castle <span aria-hidden="true">✧</span></span></footer>
+  </div>
+  <dialog id="about-dialog" aria-labelledby="about-title"><form method="dialog"><button class="dialog-close" aria-label="Close host note">×</button></form><p class="eyebrow">A NOTE FROM THE HOST</p><h2 id="about-title">Everyone gets a little stage.</h2><p>These characters speak lines from the Castle’s stored scripts. They are scripted personas, not live models.</p><p>Choose a door, give the cast a cue, reveal a joke, or let Q interrupt. Nothing here calls a model or asks for a key. This page does not save your performance.</p><p>Some ideas are fragments. They’re welcome here, too.</p></dialog>
+  <noscript><p class="noscript-note">This small theater needs JavaScript to open its rooms. Its room and character scripts are still available in the repository.</p></noscript>
+</body>
+</html>
