@@ -27,6 +27,18 @@ MAX_PROMPT_BYTES = 160 * 1024
 MAX_COMPLETION_TOKENS = 2048
 ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$')
 MODEL = re.compile(r'^[a-z0-9_.-]+/[A-Za-z0-9_.:-]+$')
+# Model lanes v0: named per-call price ceilings in USD per million tokens.
+# A lane bounds unit price, not the per-task budget; both are enforced independently.
+LANES = {
+    'economy': {'max_input_usd_per_million': '0.10',
+                'max_output_usd_per_million': '0.50'},
+}
+Z_LANE_EXEMPT_PREFIXES = ('mistralai/', 'mistral/')
+# Mark granted Z (Vibe/Mistral) a control exemption on 2026-10-21: lane price
+# caps do not apply to Mistral-family models through this inclusive date, so
+# exemption use is observable on plan receipts before caps honestly
+# re-enforce. There is no configuration opt-out; expiry is enforced in code.
+Z_LANE_EXEMPT_UNTIL = date(2026, 10, 28)
 SECRET = re.compile(r'sk-or-v1-[A-Za-z0-9_-]+|sk-[A-Za-z0-9_-]{20,}|-----BEGIN (?:[A-Z ]+ )?PRIVATE KEY-----')
 SOURCE_EXTENSIONS = {'.py', '.md', '.json', '.csv', '.js', '.txt'}
 FORBIDDEN_NAMES = {'node_modules', 'venv', 'dist', 'build', '__pycache__'}
@@ -187,12 +199,41 @@ def freeze_packet(repo, task, commit):
     return packet
 
 
+def lane_exempt(model):
+    """True when the dated Z (Vibe/Mistral) control exemption covers this model."""
+    return (model.startswith(Z_LANE_EXEMPT_PREFIXES)
+            and datetime.now(timezone.utc).date() <= Z_LANE_EXEMPT_UNTIL)
+
+
+def lane_violation(config, model):
+    """Return a blocked reason when the model exceeds the declared lane price caps."""
+    if 'model_lane' not in config or lane_exempt(model):
+        return None
+    price = config['pricing'].get(model)
+    if not isinstance(price, dict):
+        return None  # Missing or malformed pricing is independently blocking in estimate().
+    caps = LANES[config['model_lane']]
+    try:
+        for field, cap in (('input_usd_per_million', caps['max_input_usd_per_million']),
+                           ('output_usd_per_million', caps['max_output_usd_per_million'])):
+            if money(price[field]) > money(cap):
+                return (model + ' exceeds the ' + config['model_lane'] + ' lane cap on ' +
+                        field + '; use a cheaper model or change the lane policy')
+    except (ValueError, TypeError, KeyError):
+        return None  # Invalid pricing fields are independently blocking in estimate().
+    return None
+
+
 def validate_config(config):
-    optional = ('reasoning_effort',) if isinstance(config, dict) and 'reasoning_effort' in config else ()
+    optional = tuple(field for field in ('reasoning_effort', 'model_lane')
+                     if isinstance(config, dict) and field in config)
     fields(config, ('task', 'worker_model', 'reviewer_model', 'budget_usd', 'allow_paid',
                     'max_completion_tokens', 'pricing') + optional)
-    if optional:
+    if 'reasoning_effort' in optional:
         require(config['reasoning_effort'] == 'low', 'reasoning_effort must be the explicit string low')
+    if 'model_lane' in optional:
+        require(config['model_lane'] in LANES,
+                'model_lane must be a named lane: ' + ', '.join(sorted(LANES)))
     require(type(config['allow_paid']) is bool, 'allow_paid must be boolean')
     require(type(config['max_completion_tokens']) is int and
             1 <= config['max_completion_tokens'] <= MAX_COMPLETION_TOKENS,
@@ -280,6 +321,14 @@ def plan(config, packet, prior=None):
                            'estimated_cost_usd': str(cost) if cost is not None else None}
         if 'reasoning_effort' in config:
             estimates[role]['requested_reasoning_effort'] = config['reasoning_effort']
+        if 'model_lane' in config:
+            estimates[role]['model_lane'] = config['model_lane']
+            if lane_exempt(config[role + '_model']):
+                estimates[role]['z_lane_exemption'] = ('mistral-family model exempt through ' +
+                                                       Z_LANE_EXEMPT_UNTIL.isoformat())
+        violation = lane_violation(config, config[role + '_model'])
+        if violation:
+            reasons.append(violation)
         if error:
             reasons.append(error)
     total = (sum(money(value['estimated_cost_usd']) for value in estimates.values())

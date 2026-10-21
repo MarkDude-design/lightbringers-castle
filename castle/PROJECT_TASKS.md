@@ -91,6 +91,25 @@ checkpoint attestation. The reviewer may intentionally be a different named
 model from the worker; that role choice is not model drift. There is no
 within-role model ladder in this two-call workflow.
 
+## Model lanes (v0)
+
+Configuration may declare an optional `model_lane` naming a per-call unit-price
+ceiling. v0 ships one lane, `economy`: at most $0.10 input and $0.50 output per
+million tokens. The lane bounds unit price, not the per-task budget; both are
+enforced independently at plan time, before any transport call. Lane state is
+recorded per role in the plan output (`model_lane`, plus `z_lane_exemption`
+when applicable). A model priced above the declared lane blocks preflight with
+an explicit reason; unknown lane names are rejected at validation. Lane caps
+are policy knobs: tune them in review by editing `LANES`.
+
+Z (Vibe/Mistral) control exemption: Mark granted a dated exemption on
+2026-10-21. Mistral-family models (`mistralai/*`, `mistral/*`) are exempt from
+lane price caps through 2026-10-28 inclusive, so exemption use is observable
+on plan receipts before caps honestly re-enforce on 2026-10-29. The exemption
+cannot be extended through configuration; it lives in code as
+`Z_LANE_EXEMPT_UNTIL`, and every other check (free/paid opt-in, budget, dated
+pricing, model identity) still applies.
+
 ## Optional low reasoning effort
 
 An additional configuration field opts both roles into lower reasoning effort:
