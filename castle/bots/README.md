@@ -21,6 +21,8 @@ Chaotic, creative, sandboxed personalities.
 - Surrealist Bot
 - Hedberg Bot
 - Glitchling
+- Ack Bot
+- Nando
 
 ## Rules
 - Curated bots appear in all rooms.

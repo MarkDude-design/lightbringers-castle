@@ -17,7 +17,7 @@ v0.1 content remains scripted. An experimental live API conversation runner is n
 
 ## Step into the scripted theater
 
-The [browser stage](castle/theater.html) opens six rooms from the existing
+The [browser stage](castle/theater.html) opens ten rooms from the existing
 Castle scripts. Cue a character, reveal a punchline, nudge the scenery, or let
 Q interrupt. All dialogue is stored content; no model calls or keys are needed.
 See [preview instructions and boundaries](castle/THEATER.md). This stage is

@@ -53,3 +53,7 @@ echoing_amphitheater,Echoing Amphitheater,A grand performance space with impossi
 vault_of_beginnings,Vault of Beginnings,A repository of all first moments and origins,generative,creation,2,beginning_bot|void_explorer,,active,creation,15,medium,vault_beginnings_001,vault|beginning|origin
 chamber_of_endings,Chamber of Endings,A space for closure and transition,reflective,completion,2,ending_bot|peace_keeper,,active,completion,15,medium,chamber_endings_001,chamber|ending|closure
 crossroads_of_choice,Crossroads of Choice,A pivotal meeting point where paths diverge,decisive,decisions,3,truth_bot|middle_ground|grey_diplomat,,active,decisions,30,medium,crossroads_choice_001,crossroads|choice|path
+library_of_receipts,Library of Receipts,A hushed archive where jokes are stamped and notarized,archival,knowledge,2,ontology_knight|camus_bots,,active,archive,25,easy,library_receipts_001,receipts|archive|honesty
+boiler_room,Boiler Room of Ambient Honesty,A warm basement where truths are pressurized and vented,candid,truth,2,safety_siren|emotional_weather,,active,core,20,easy,boiler_room_001,honesty|pressure|warmth
+vinyl_vault,Vinyl Vault of Precolonial Beats,A subterranean record vault older than its building,musical,music,2,dj_love|q_overlay,,active,music,30,medium,vinyl_vault_001,music|lineage|groove
+guest_book_nook,Guest Book Nook,A cozy alcove where every visitor signs in,welcoming,hospitality,3,lightbringer|ack_bot|nando,,active,core,15,easy,guest_book_nook_001,guestbook|signature|welcome

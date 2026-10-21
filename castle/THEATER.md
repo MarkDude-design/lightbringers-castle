@@ -1,12 +1,12 @@
 # A small, scripted theater
 
-`theater.html` is the Castle's first browser stage. It reads the six existing
+`theater.html` is the Castle's first browser stage. It reads the ten existing
 room scripts and the characters present in each room. Nothing in this page
 invokes `talk.py`, `project_tasks.py`, model endpoints, or local tools.
 
 ## The first slice
 
-- Choose one of six doors; a room hash such as `#garden` opens that room.
+- Choose one of ten doors; a room hash such as `#garden` opens that room.
 - Give a character a cue to cycle through their stored responses.
 - Nudge the scenery to cycle through the room's environment gags.
 - Reveal the current joke, then reset or move to the next telling.

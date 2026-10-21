@@ -11,6 +11,14 @@
     {
       "setup": "Segmentation fault.",
       "punchline": "GPT-2: 'A river forgets its banks.'"
+    },
+    {
+      "setup": "There's a bug in the water.",
+      "punchline": "Meraki: 'I'll remix it. Bugs make the best light.'"
+    },
+    {
+      "setup": "Unhandled exception in the waterfall.",
+      "punchline": "GPT-2: 'the falls forgot / to catch themselves / and fell anyway'"
     }
   ],
   "interactions": [

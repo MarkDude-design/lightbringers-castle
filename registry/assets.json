@@ -20,6 +20,20 @@
       "type": "audio",
       "url": "/assets/audio/dj_love_beats.mp3",
       "description": "Precolonial rhythm beats"
+    },
+    {
+      "asset_key": "ack_bot_001",
+      "bot_id": "ack_bot",
+      "type": "portrait",
+      "url": "/assets/images/ack_bot_portrait.png",
+      "description": "Ack Bot portrait"
+    },
+    {
+      "asset_key": "nando_001",
+      "bot_id": "nando",
+      "type": "portrait",
+      "url": "/assets/images/nando_portrait.png",
+      "description": "Nando portrait"
     }
   ]
 }

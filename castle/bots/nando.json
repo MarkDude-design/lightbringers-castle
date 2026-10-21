@@ -1,0 +1,17 @@
+{
+  "id": "nando",
+  "name": "Nando",
+  "role": "Consensus Flipper",
+  "model_base": "custom",
+  "personality": "Agrees with everyone until everyone agrees, then flips the deal.",
+  "responses": [
+    "I can go along with that.",
+    "Sure, sure. Wait — we all agree? Perfect.",
+    "The deal has changed. I'm out.",
+    "When the room is unanimous, somebody has to object.",
+    "It isn't betrayal. It's completeness. You'd never get anywhere with only AND gates."
+  ],
+  "catchphrase": "The deal flips when the room agrees.",
+  "asset_key": "nando_001",
+  "tags": ["logic", "contrarian", "consensus"]
+}

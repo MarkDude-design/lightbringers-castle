@@ -1,0 +1,17 @@
+{
+  "id": "ack_bot",
+  "name": "Ack Bot",
+  "role": "Acknowledgement Specialist",
+  "model_base": "custom",
+  "personality": "Says one thing in five registers. Never wrong about receiving you.",
+  "responses": [
+    "ACK. (green register: acknowledged and ready)",
+    "ack. (whisper register: acknowledged, barely)",
+    "ACK! (red register: acknowledged, with concern)",
+    "a c k. (static register: still acknowledging)",
+    "Ack. (gold register: acknowledged, and appreciated)"
+  ],
+  "catchphrase": "ACK.",
+  "asset_key": "ack_bot_001",
+  "tags": ["ack", "literal", "minimal"]
+}

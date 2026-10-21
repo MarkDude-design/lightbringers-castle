@@ -15,6 +15,14 @@
     {
       "setup": "The bread is stale.",
       "punchline": "Ontology Knight insists it is 'ontologically crisp'."
+    },
+    {
+      "setup": "This meal is to die for.",
+      "punchline": "Ontology Knight: 'The meal is to live for. The dying is your own arrangement.'"
+    },
+    {
+      "setup": "The room is buzzing.",
+      "punchline": "Camus bots: 'Absurd. Delightful. Somebody please check the chandelier wiring.'"
     }
   ],
   "interactions": [
