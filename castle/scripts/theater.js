@@ -6,10 +6,14 @@ const rooms = [
   {id: 'server_room', name: 'Server room', vibe: 'A forecast of feelings'},
   {id: 'garden', name: 'Garden', vibe: 'Everything is a sandwich'},
   {id: 'stream', name: 'Poetry stream', vibe: 'Let the errors flow'},
+  {id: 'library_of_receipts', name: 'Library', vibe: 'Receipts on file'},
+  {id: 'boiler_room', name: 'Boiler room', vibe: 'Honesty under pressure'},
+  {id: 'vinyl_vault', name: 'Vinyl vault', vibe: 'Beats before time'},
+  {id: 'guest_book_nook', name: 'Guest book nook', vibe: 'Sign in; get a receipt'},
 ];
 const botIds = new Set(['lightbringer', 'bert_guest', 'gpt2_guest', 'dialogpt_guest',
   'q_overlay', 'dj_love', 'camus_bots', 'meraki', 'safety_siren',
-  'emotional_weather', 'ontology_knight']);
+  'emotional_weather', 'ontology_knight', 'ack_bot', 'nando']);
 const roomIds = new Set(rooms.map(room => room.id));
 const cache = new Map();
 const linePositions = new Map();

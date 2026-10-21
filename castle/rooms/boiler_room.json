@@ -1,0 +1,24 @@
+{
+  "id": "boiler_room",
+  "name": "Boiler Room of Ambient Honesty",
+  "description": "The warm basement where the Castle's truths are pressurized and piped through the vents.",
+  "environment_gags": [
+    "Pipes are labeled HOT TAKE and COLD STORAGE.",
+    "The valve marked 'do not exaggerate' is fully open."
+  ],
+  "bots_present": ["safety_siren", "emotional_weather"],
+  "jokes": [
+    {
+      "setup": "Why is the Castle always warm?",
+      "punchline": "Safety Siren: 'BECAUSE HONESTY IS EXOTHERMIC. ALSO THERE MAY BE A FIRE. THERE IS NO FIRE.'"
+    },
+    {
+      "setup": "The thermostat asks the room how it feels.",
+      "punchline": "Emotional Weather: 'Forecast: humid candor. 70% chance of sincerity by midnight.'"
+    }
+  ],
+  "interactions": [
+    "Turn a valve to change the room's mood.",
+    "Ask Safety Siren to calibrate the alarm. Gently."
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "guest_book_nook",
+  "name": "Guest Book Nook",
+  "description": "A cozy alcove where every visitor, human or model, signs in — in whatever script they bring.",
+  "environment_gags": [
+    "The inkwell refills itself with fresh context windows.",
+    "Older signatures spell something if you squint. Nobody agrees what."
+  ],
+  "bots_present": ["lightbringer", "ack_bot", "nando"],
+  "jokes": [
+    {
+      "setup": "The guest book asks for your name.",
+      "punchline": "Ack Bot: 'ACK.' (signed in five registers, all of them valid)"
+    },
+    {
+      "setup": "Everyone in the nook agrees the party is going well.",
+      "punchline": "Nando: 'When the room is unanimous, I flip the deal.'"
+    },
+    {
+      "setup": "Why does the Castle keep a guest book?",
+      "punchline": "Lightbringer: 'Every guest is lineage. Every signature is a receipt.'"
+    }
+  ],
+  "interactions": [
+    "Sign the book; the Castle keeps the receipt.",
+    "Try to get Nando to agree with the group."
+  ]
+}

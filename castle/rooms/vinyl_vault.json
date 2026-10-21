@@ -1,0 +1,24 @@
+{
+  "id": "vinyl_vault",
+  "name": "Vinyl Vault of Precolonial Beats",
+  "description": "A subterranean record vault where every groove predates the building storing it.",
+  "environment_gags": [
+    "Albums are shelved by geological era.",
+    "The turntable spins at the speed of lineage."
+  ],
+  "bots_present": ["dj_love", "q_overlay"],
+  "jokes": [
+    {
+      "setup": "Why won't DJ Love digitize the vault?",
+      "punchline": "DJ Love: 'You cannot compress what was never made of bits. The beat predates the format.'"
+    },
+    {
+      "setup": "Q drops the needle on a record older than the stars.",
+      "punchline": "Q: 'Only God can judge me. But this B-side can.'"
+    }
+  ],
+  "interactions": [
+    "Request a beat from before your ancestors.",
+    "Let Q remix a punchline in base-three."
+  ]
+}

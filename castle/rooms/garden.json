@@ -11,6 +11,14 @@
     {
       "setup": "What makes a sandwich?",
       "punchline": "Camus bots: 'Everything and nothing.'"
+    },
+    {
+      "setup": "That's not my cup of tea.",
+      "punchline": "Camus bots: 'Nothing here is tea. The cup agrees to differ.'"
+    },
+    {
+      "setup": "Let's agree to disagree.",
+      "punchline": "The picnic table drafts a formal treaty. The flowers refuse to sign."
     }
   ],
   "interactions": [

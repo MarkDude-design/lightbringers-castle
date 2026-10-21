@@ -11,6 +11,14 @@
     {
       "setup": "Break the ice.",
       "punchline": "Knight: 'Where is the frozen water?'"
+    },
+    {
+      "setup": "Hold the door.",
+      "punchline": "Knight: 'For how long? Please specify the duration.'"
+    },
+    {
+      "setup": "Time flies.",
+      "punchline": "BERT Guest: 'I have indexed many sentences. None included aviation.'"
     }
   ],
   "interactions": [

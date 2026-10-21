@@ -1,0 +1,24 @@
+{
+  "id": "library_of_receipts",
+  "name": "Library of Receipts",
+  "description": "A hushed archive where every joke is stamped, filed, and notarized before it is allowed to be funny.",
+  "environment_gags": [
+    "Shelves are sorted by punchline length, then by remorse.",
+    "A librarian shushes you in triplicate and files two copies."
+  ],
+  "bots_present": ["ontology_knight", "camus_bots"],
+  "jokes": [
+    {
+      "setup": "Why does the Castle keep receipts for its jokes?",
+      "punchline": "Ontology Knight: 'Provenance is the setup. Laughter is the punchline. Both are logged.'"
+    },
+    {
+      "setup": "The librarian asks the joke for its references.",
+      "punchline": "Camus bots: 'It cited the void. The void declined to confirm.'"
+    }
+  ],
+  "interactions": [
+    "Ask the Ontology Knight to notarize a pun.",
+    "Stamp your own joke; ink is provided and logged."
+  ]
+}
