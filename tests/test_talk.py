@@ -249,6 +249,94 @@ class TalkTests(unittest.TestCase):
             self.assertEqual(room_tools.read_room({'room_id': 'mismatch'}, base)['error']['code'],
                              'room_id_mismatch')
 
+    def check_registry_eligibility_fault(self, phase):
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp).resolve()
+            data = {name: {'id': name, 'detail': name} for name in ('a_bad', 'b_good', 'c_good')}
+            for name in reversed(data):
+                (base / (name + '.json')).write_bytes(json.dumps(data[name]).encode('utf-8'))
+            target = base / 'a_bad.json'
+            original_is_file, original_stat = Path.is_file, Path.stat
+            operations = {
+                'paths': lambda: list(room_tools.room_paths(base)),
+                'catalog': lambda: room_tools.tool_catalog(base)[0]['function']['parameters']['properties']['room_id']['enum'],
+                'missing': lambda: room_tools.read_room({'room_id': 'a_bad'}, base),
+                'healthy': lambda: room_tools.read_room({'room_id': 'b_good'}, base),
+            }
+            for error in (FileNotFoundError, PermissionError, OSError):
+                for name, operation in operations.items():
+                    with self.subTest(phase=phase, error=error.__name__, reader=name):
+                        checked, sizes, completed, failures = {}, {}, set(), []
+                        def is_file(path):
+                            checked[path] = checked.get(path, 0) + 1
+                            self.assertEqual(checked[path], 1, 'Eligibility must not retry')
+                            if path == target and phase == 'is_file':
+                                failures.append(phase)
+                                raise error('Synthetic file eligibility failure')
+                            result = original_is_file(path)
+                            self.assertTrue(result)
+                            completed.add(path)
+                            return result
+                        def stat(path, *args, **kwargs):
+                            # Ignore Path.resolve/is_file internals across Python/platforms.
+                            if path in completed:
+                                sizes[path] = sizes.get(path, 0) + 1
+                                self.assertEqual(sizes[path], 1, 'Size eligibility must not retry')
+                                if path == target:
+                                    failures.append(phase)
+                                    raise error('Synthetic size eligibility failure')
+                            return original_stat(path, *args, **kwargs)
+                        with patch.object(Path, 'is_file', is_file), patch.object(Path, 'stat', stat):
+                            result = operation()
+                        expected = ['b_good', 'c_good']
+                        if name in ('paths', 'catalog'):
+                            self.assertEqual(result, expected)
+                        elif name == 'missing':
+                            self.assertEqual(result, {'ok': False, 'data': None, 'error': {
+                                'code': 'unknown_room', 'message': 'Unknown Castle room ID.',
+                                'available_rooms': expected}})
+                        else:
+                            self.assertEqual(result, {'ok': True, 'data': data['b_good'], 'error': None})
+                        self.assertEqual(checked, {base / (n + '.json'): 1 for n in data})
+                        self.assertEqual(failures, [phase])
+                        self.assertEqual(sizes, {base / (n + '.json'): 1 for n in data
+                                               if phase == 'size_stat' or n != 'a_bad'})
+
+    def test_registry_skips_size_stat_errors_once_for_all_readers(self):
+        self.check_registry_eligibility_fault('size_stat')
+
+    def test_registry_skips_is_file_errors_once_for_all_readers(self):
+        self.check_registry_eligibility_fault('is_file')
+
+    def test_registry_preserves_containment_size_boundary_and_order(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp).resolve() / 'rooms'
+            base.mkdir()
+            for name in ('z_good', 'a_good', 'INVALID', 'bad-id'):
+                (base / (name + '.json')).write_bytes(json.dumps({'id': name}).encode('utf-8'))
+            edge = {'id': 'boundary', 'detail': 'Exactly 64 KiB'}
+            raw = json.dumps(edge).encode('utf-8')
+            raw += b' ' * (64 * 1024 - len(raw))
+            (base / 'boundary.json').write_bytes(raw)
+            (base / 'large.json').write_bytes(raw + b' ')
+            (base / 'directory.json').mkdir()
+            outside = base.parent / 'outside.json'
+            outside.write_bytes(b'{"id":"escape"}')
+            (base / 'escape.json').symlink_to(outside)
+            (base / 'inside.json').symlink_to(base / 'a_good.json')
+            self.assertEqual(len(raw), 64 * 1024)
+            self.assertEqual(list(room_tools.room_paths(base)), ['a_good', 'boundary', 'inside', 'z_good'])
+            self.assertEqual(room_tools.read_room({'room_id': 'boundary'}, base),
+                             {'ok': True, 'data': edge, 'error': None})
+
+    def test_registry_does_not_swallow_non_filesystem_errors(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / 'room.json').write_bytes(b'{"id":"room"}')
+            with patch.object(Path, 'is_file', side_effect=ValueError('Synthetic unrelated failure')) as check:
+                with self.assertRaisesRegex(ValueError, 'unrelated failure'):
+                    room_tools.room_paths(tmp)
+            check.assert_called_once()
+
     def test_key_echoes_are_redacted_from_console_and_transcript(self):
         with tempfile.TemporaryDirectory() as tmp:
             key = 'secret-test-key'
@@ -388,11 +476,13 @@ class TalkTests(unittest.TestCase):
             tool_result = continuation['messages'][-1]
             self.assertEqual(tool_result['role'], 'tool')
             self.assertEqual(tool_result['tool_call_id'], 'call-courtyard')
-            self.assertTrue(json.loads(tool_result['content'])['ok'])
+            expected = json.loads((room_tools.ROOMS_DIR / 'courtyard.json').read_bytes())
+            self.assertEqual(json.loads(tool_result['content']), {'ok': True, 'data': expected, 'error': None})
             rows = [json.loads(line) for line in next(Path(tmp).glob('*.jsonl')).read_text().splitlines()]
             executed = [row for row in rows if row['event'] == 'tool_executed']
             self.assertEqual(len(executed), 1)
-            self.assertEqual(executed[0]['result']['data']['id'], 'courtyard')
+            self.assertEqual(executed[0]['tool_call_id'], 'call-courtyard')
+            self.assertEqual(executed[0]['result'], {'ok': True, 'data': expected, 'error': None})
             finished = [row for row in rows if row['event'] == 'session_finished'][0]
             self.assertEqual((finished['api_calls'], finished['tool_executions'], finished['replies']),
                              (2, 1, 1))

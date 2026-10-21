@@ -612,7 +612,8 @@ class ProjectTaskTests(unittest.TestCase):
             self.assertEqual(source['sha256'], hashlib.sha256((root / source['path']).read_bytes()).hexdigest())
 
     def test_host_enumeration_gap_fixture_distinguishes_read_time_handling(self):
-        # Reproduce the host finding, not a worker discovery or the proposed repair.
+        # Host/Codex synthetic finding: enumeration previously escaped. Keep the
+        # original injection proof as a handled-result regression, not a worker discovery.
         rooms = self.repo / 'rooms'
         rooms.mkdir()
         # Exercise an alias on every host, including Linux, rather than relying
@@ -628,7 +629,7 @@ class ProjectTaskTests(unittest.TestCase):
         original_stat = Path.stat
         original_is_file = Path.is_file
         original_bytes = target.read_bytes()
-        for error in (FileNotFoundError, PermissionError):
+        for error in (FileNotFoundError, PermissionError, OSError):
             with self.subTest(error=error.__name__):
                 state = {'armed': False, 'is_file_results': [], 'failures': 0}
                 def existing(path):
@@ -645,8 +646,9 @@ class ProjectTaskTests(unittest.TestCase):
                         raise error('Synthetic enumeration size-stat failure')
                     return original_stat(path, *args, **kwargs)
                 with patch.object(Path, 'stat', disappearing), patch.object(Path, 'is_file', existing):
-                    with self.assertRaisesRegex(error, 'enumeration size-stat'):
-                        tasks.talk.room_tools.read_room({'room_id': 'courtyard'}, rooms)
+                    result = tasks.talk.room_tools.read_room({'room_id': 'courtyard'}, rooms)
+                self.assertEqual(result, {'ok': False, 'data': None, 'error': {
+                    'code': 'unknown_room', 'message': 'Unknown Castle room ID.', 'available_rooms': []}})
                 self.assertEqual(state['is_file_results'], [True])
                 self.assertEqual(state['failures'], 1)
                 with patch.object(Path, 'read_text', side_effect=error('Synthetic read-time failure')):
