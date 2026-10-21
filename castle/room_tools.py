@@ -24,8 +24,13 @@ def room_paths(rooms_dir=ROOMS_DIR):
     paths = {}
     for path in sorted(base.glob('*.json')):
         resolved = path.resolve()
-        if (ROOM_ID.fullmatch(path.stem) and resolved.parent == base
-                and resolved.is_file() and resolved.stat().st_size <= 64 * 1024):
+        if not (ROOM_ID.fullmatch(path.stem) and resolved.parent == base):
+            continue
+        try:
+            eligible = resolved.is_file() and resolved.stat().st_size <= 64 * 1024
+        except OSError:
+            continue
+        if eligible:
             paths[path.stem] = resolved
     return paths
 
