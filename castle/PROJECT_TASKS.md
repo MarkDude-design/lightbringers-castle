@@ -104,8 +104,8 @@ are policy knobs: tune them in review by editing `LANES`.
 
 Z (Vibe/Mistral) control exemption: Mark granted a dated exemption on
 2026-10-21. Mistral-family models (`mistralai/*`, `mistral/*`) are exempt from
-lane price caps through 2026-10-28 inclusive, so exemption use is observable
-on plan receipts before caps honestly re-enforce on 2026-10-29. The exemption
+lane price caps through 2026-11-04 inclusive, so exemption use is observable
+on plan receipts before caps honestly re-enforce on 2026-11-05. The exemption
 cannot be extended through configuration; it lives in code as
 `Z_LANE_EXEMPT_UNTIL`, and every other check (free/paid opt-in, budget, dated
 pricing, model identity) still applies.
