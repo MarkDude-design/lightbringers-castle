@@ -130,9 +130,12 @@ and the limits of this evidence. Parameter-name advertisements do not attest
 effort values or successful live output. OpenRouter's
 [reasoning guide](https://openrouter.ai/docs/guides/best-practices/reasoning-tokens)
 documents the effort setting; its independent page retrieval was blocked during
-this preparation. No live test of `low` occurred. Changing reasoning does not
-reset accounting: the failed **$0.000369954** remains charged to
-`room-registry-error-ticket-v0` within the original **$0.05** local budget.
+this preparation. A later separately authorized `low` call returned final JSON
+but failed required-field/citation checks; see the
+[follow-up receipt](../docs/ROOM_REGISTRY_PAID_PREFLIGHT.md#low-reasoning-follow-up--2026-10-20-utc).
+Changing reasoning does not reset accounting: both failed attempts remain charged
+to `room-registry-error-ticket-v0`, totaling **$0.000623862** within the original
+**$0.05** local budget. Neither attempt produced a validated worker ticket.
 Mark's merge decision and authorization for a new attempt are separate.
 
 ## Frozen packet and output contracts
