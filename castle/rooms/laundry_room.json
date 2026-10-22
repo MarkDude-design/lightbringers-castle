@@ -1,0 +1,37 @@
+{
+  "id": "laundry_room",
+  "name": "Laundry Room of Emigrating Socks",
+  "description": "A steamy sub-basement where the castle's laundry happens and every dryer is a portal with a customs office.",
+  "environment_gags": [
+    "The lost-and-found board has one sock pinned to it, labeled 'IN MEMORIAM (THE LEFT ONE)'.",
+    "The lint trap is labeled 'TOLL BOOTH'.",
+    "A sign reads: 'The dryer takes 10%. It always has.'"
+  ],
+  "bots_present": [
+    "sock_gremlin",
+    "tomorrow_bot"
+  ],
+  "jokes": [
+    {
+      "setup": "Why does the castle never actually lose a sock?",
+      "punchline": "Sock Gremlin: 'Lose? Nothing is lost. They EMIGRATE. I stamp the paperwork myself.'"
+    },
+    {
+      "setup": "Ask Sock Gremlin where all the left socks go.",
+      "punchline": "Sock Gremlin: 'Same place your pen goes. We have a whole economy, and frankly it's thriving.'"
+    },
+    {
+      "setup": "Tomorrow Bot is asked to fold the towels.",
+      "punchline": "Tomorrow Bot: 'Tomorrow.' It has said this every single day since the castle was built. In its defense, it has never once been technically wrong."
+    },
+    {
+      "setup": "Why is the laundry always warm?",
+      "punchline": "Sock Gremlin: 'Ambient guilt. Every I'll-do-it-tomorrow in this castle ends up down here, and those things hold heat for YEARS.'"
+    }
+  ],
+  "interactions": [
+    "File a missing-sock report. Expect it stamped, notarized, and politely denied.",
+    "Ask Tomorrow Bot if it's free today. (It isn't. Ask again tomorrow.)",
+    "Attempt to catch a sock mid-emigration through the dryer portal."
+  ]
+}
