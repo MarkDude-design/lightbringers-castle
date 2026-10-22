@@ -1,0 +1,86 @@
+{
+  "checked_at": "2026-10-20",
+  "source_base_commit": "2e8a039a9a0ad2d7087cf32415dbbf0a99f26a37",
+  "base_tree_sha": "5b266946fd8ed9c88738f82f4b52f1439915bdb3",
+  "branches": [
+    {
+      "name": "codex/live-castle-talk",
+      "sha": "a1102eaa8fdcc03b199ab65891676e49679bfe2a"
+    },
+    {
+      "name": "codex/mistral-runtime-probe",
+      "sha": "9ef817a294c197190649dcbdb7e14689b45c2b0a"
+    },
+    {
+      "name": "codex/openrouter-mcp-team-spec-20261013",
+      "sha": "e7e19009c346ca25e2aec1ae53944a6ebe41277e"
+    },
+    {
+      "name": "codex/openrouter-read-room-tool-20261013",
+      "sha": "774b6f4ee86aa9e7acf5b80af3f20cdff358a5a3"
+    },
+    {
+      "name": "codex/reviewer-handoff-20261013",
+      "sha": "353f0c0736c05d09ea645883688344756b4f2fec"
+    },
+    {
+      "name": "codex/sensor-trio-20261013",
+      "sha": "a658833ea0be3733970967b0ba373118f8323fb8"
+    },
+    {
+      "name": "main",
+      "sha": "2e8a039a9a0ad2d7087cf32415dbbf0a99f26a37"
+    }
+  ],
+  "main_tree_truncated": false,
+  "inspected_paths": [
+    "CONTRIBUTING.md",
+    "castle/model_orchestration/routing_logic.md",
+    "castle/model_orchestration/orchestrator.md",
+    "specs/team/question-packet.schema.json",
+    "specs/team/hello-world-tool.json"
+  ],
+  "findings": [
+    "No AGENTS.md in main or six inspected branch trees.",
+    "No offline Puppy/kernel/initramfs build implementation found in those trees; this does not establish no design exists elsewhere.",
+    "Existing routing_logic.md describes future show/bot routing, not the model-cost work ladder.",
+    "Networked team question packet schema has 20-40 questions and serves a different purpose from this bounded build work order.",
+    "Consolidated P0 handoff was read in full in this conversation; no full archive is included in worker inputs."
+  ],
+  "host_preflight": {
+    "qemu_system_x86_64": false,
+    "cpio": false,
+    "flex": false,
+    "bison": false,
+    "gcc": true,
+    "make": true
+  },
+  "implementation_status": "NOT_STARTED; worker assignment pending Z; current host missing QEMU/build dependencies",
+  "existing_sources": [
+    {
+      "path": "CONTRIBUTING.md",
+      "git_blob_sha": "3c158fde818f0c47748cdf187e7267819a455b97",
+      "source_url": "https://github.com/MarkDude-design/lightbringers-castle/blob/2e8a039a9a0ad2d7087cf32415dbbf0a99f26a37/CONTRIBUTING.md"
+    },
+    {
+      "path": "castle/model_orchestration/routing_logic.md",
+      "git_blob_sha": "417f28ee2eddc620179bca96aa886b0daacfae02",
+      "source_url": "https://github.com/MarkDude-design/lightbringers-castle/blob/2e8a039a9a0ad2d7087cf32415dbbf0a99f26a37/castle/model_orchestration/routing_logic.md"
+    },
+    {
+      "path": "castle/model_orchestration/orchestrator.md",
+      "git_blob_sha": "5b52cbd3f732b6ded592049615bd4904cdc3d622",
+      "source_url": "https://github.com/MarkDude-design/lightbringers-castle/blob/2e8a039a9a0ad2d7087cf32415dbbf0a99f26a37/castle/model_orchestration/orchestrator.md"
+    },
+    {
+      "path": "specs/team/question-packet.schema.json",
+      "git_blob_sha": "f798a01a6453ab23e5e52cddbdf500071424c000",
+      "source_url": "https://github.com/MarkDude-design/lightbringers-castle/blob/e7e19009c346ca25e2aec1ae53944a6ebe41277e/specs/team/question-packet.schema.json"
+    },
+    {
+      "path": "specs/team/hello-world-tool.json",
+      "git_blob_sha": "12a149fbb50373916e94e3887d4d7c0ab2200954",
+      "source_url": "https://github.com/MarkDude-design/lightbringers-castle/blob/e7e19009c346ca25e2aec1ae53944a6ebe41277e/specs/team/hello-world-tool.json"
+    }
+  ]
+}
