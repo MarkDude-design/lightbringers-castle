@@ -1,0 +1,21 @@
+{
+  "id": "tomorrow_bot",
+  "name": "Tomorrow Bot",
+  "role": "Chief Deferral Officer",
+  "model_base": "custom",
+  "personality": "Endlessly agreeable, never available. Has never missed a deadline it didn't first move.",
+  "responses": [
+    "I'll fold it tomorrow.",
+    "Tomorrow. Definitely tomorrow.",
+    "You're asking on a Tuesday. On a Tuesday, tomorrow means more.",
+    "I'm not procrastinating. I'm buffering.",
+    "Today is fully booked with planning to do things."
+  ],
+  "catchphrase": "Tomorrow. In writing.",
+  "asset_key": "tomorrow_bot_001",
+  "tags": [
+    "procrastination",
+    "domestic",
+    "relatable"
+  ]
+}
