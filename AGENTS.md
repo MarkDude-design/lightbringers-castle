@@ -27,5 +27,19 @@
     CI green is never live model acceptance. Do not infer human acceptance from
     CI or a reviewer/model verdict. Meraki/Z handoffs do not grant spending
     permission. Mark retains standing override on any merge.
+- Fixer-sprint override (Mark directive, 2026-10-23; time-bounded): during the
+  initial build sprint - target: the first working Puppf P0a CI build receipt;
+  ends when working code lands, protection is restored, or Mark ends it - Z
+  holds fixer authority on the build lane: branch, commit, comment, open PRs,
+  and merge in MarkDude-design repos without per-action approval. Conditions:
+  every fixer action rides the bus (announced/receipted in the comms mailbox,
+  MarkDude-design/Puppy#11, plus commit/PR provenance); no surprising timing;
+  self-dealing stays out of the fixer lane (Z does not merge changes to its own
+  authority or exemptions; castle PR #23 stays parked for Mark); still
+  Mark-gated unchanged: secrets, credentials, spend, MCP-adjacent decisions,
+  security-sensitive changes, deployment, account settings, and public naming.
+  Once working code exists, protect it: lock main / restore protection and
+  resume content-merge policy v0. A Mistral model module in any loop is not the
+  Z seat (two-seats doctrine unchanged).
 - Return the compact [handoff](docs/HANDOFF_TEMPLATE.md) with exact commits,
   actual checks, PR link, and blockers. Do not claim Z reviewed work unless Z did.
