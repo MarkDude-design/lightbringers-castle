@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lightbringers.example/specs/team/digest-submission.schema.json",
+  "title": "Castle Team Digest Submission",
+  "type": "object",
+  "properties": {
+    "packet_handle": {"type": "string", "format": "uuid"},
+    "packet_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "answers": {
+      "type": "array",
+      "minItems": 20,
+      "maxItems": 40,
+      "items": {"$ref": "#/$defs/answer"}
+    },
+    "cross_findings": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {"type": "string", "minLength": 1, "maxLength": 512}
+    },
+    "nearby_moves": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "properties": {
+          "move": {"type": "string", "minLength": 1, "maxLength": 240},
+          "expected_value": {"type": "string", "minLength": 1, "maxLength": 240},
+          "cost_or_risk": {"type": "string", "minLength": 1, "maxLength": 240}
+        },
+        "required": ["move", "expected_value", "cost_or_risk"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["packet_handle", "packet_sha256", "answers", "cross_findings", "nearby_moves"],
+  "additionalProperties": false,
+  "$defs": {
+    "answer": {
+      "type": "object",
+      "properties": {
+        "question_id": {"type": "string", "pattern": "^Q[0-9]{3}$"},
+        "status": {"type": "string", "enum": ["answered", "unknown", "blocked", "conflict"]},
+        "answer": {"type": "string", "maxLength": 512},
+        "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
+        "evidence_refs": {
+          "type": "array",
+          "maxItems": 6,
+          "items": {"type": "string", "minLength": 1, "maxLength": 160}
+        },
+        "next_probe": {"type": ["string", "null"], "maxLength": 240}
+      },
+      "required": ["question_id", "status", "answer", "confidence", "evidence_refs", "next_probe"],
+      "additionalProperties": false
+    }
+  }
+}

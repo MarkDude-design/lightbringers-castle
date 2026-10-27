@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lightbringers.example/specs/team/z-review.schema.json",
+  "title": "Z Parallel Review",
+  "type": "object",
+  "properties": {
+    "schema_version": {"const": "z-review/0.1"},
+    "packet_id": {"type": "string", "pattern": "^[A-Za-z0-9._-]{1,96}$"},
+    "packet_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "reviewer": {"const": "Z"},
+    "review_status": {"type": "string", "enum": ["complete", "partial", "unavailable"]},
+    "items": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "properties": {
+          "question_id": {"type": "string", "pattern": "^Q[0-9]{3}$"},
+          "verdict": {"type": "string", "enum": ["agree", "disagree", "missing", "risk"]},
+          "note": {"type": "string", "maxLength": 400},
+          "severity": {"type": "string", "enum": ["note", "important", "blocking-proposal"]},
+          "evidence_refs": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {"type": "string", "minLength": 1, "maxLength": 160}
+          }
+        },
+        "required": ["question_id", "verdict", "note", "severity", "evidence_refs"],
+        "additionalProperties": false
+      }
+    },
+    "global_gaps": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {"type": "string", "minLength": 1, "maxLength": 400}
+    },
+    "review_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  },
+  "required": ["schema_version", "packet_id", "packet_sha256", "reviewer", "review_status", "items", "global_gaps", "review_sha256"],
+  "additionalProperties": false
+}
