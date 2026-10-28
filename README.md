@@ -41,6 +41,14 @@ For a separate, bounded worker/reviewer proposal workflow, see
 dry run, frozen source packets, cost receipts, and human acceptance without
 applying model-generated changes.
 
+## Local sensor trio
+
+An optional, bounded local lane now specifies real BERT fill-mask, MiniLM
+similarity, and DeBERTa NLI sensors. They use pinned checkpoints and emit
+provenance-rich JSON without pretending to be Castle characters. See
+[castle/sensors/README.md](castle/sensors/README.md). The heavy dependencies are
+separate; the talk runner remains standard-library only.
+
 ## Structure
 - Rooms: JSON files describing scenes, jokes, and interactions.
 - Bots: JSON files describing personalities and responses.
@@ -66,6 +74,7 @@ Phase 5 — Build our own bot (November)
 /castle
   /rooms
   /bots
+  /sensors
   /scripts
   /assets
 /registry
