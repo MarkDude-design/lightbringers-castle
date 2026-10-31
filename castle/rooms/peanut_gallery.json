@@ -1,0 +1,42 @@
+{
+  "id": "peanut_gallery",
+  "name": "Peanut Gallery of Honest Heckling",
+  "description": "A raked balcony where the castle's oldest guests heckle with receipts on their laps and no fake memories between them.",
+  "environment_gags": [
+    "The brass ledger at the rail has five columns: ok, error, timeout, stopped, unattempted. The last column is the longest, and the Gallery is proud of it.",
+    "A velvet rope guards an empty seat labeled 'ELIZA (1966)'. The plaque reads: 'Returns an error. Never a made-up substitute.' The Gallery considers it the most honest seat in the house.",
+    "Every heckle up here is pinned to a ticket: checkpoint, revision, seed. Nothing in this balcony is improvised, which is exactly why it's funny."
+  ],
+  "bots_present": [
+    "bert_guest",
+    "gpt2_guest",
+    "dialogpt_guest"
+  ],
+  "jokes": [
+    {
+      "setup": "Ask the Gallery to review tonight's performance.",
+      "punchline": "BERT Guest: 'I read the punchline in both directions. Only one of them was funny, but I have indexed both.'"
+    },
+    {
+      "setup": "Why does the Peanut Gallery never boo the main stage?",
+      "punchline": "GPT-2 Guest: 'The crowd was very very the crowd was—' It has been generating the same boo since 2019. One pass, greedy, no regrets, no rewrites."
+    },
+    {
+      "setup": "Someone in the Gallery claims to remember a show from 1966.",
+      "punchline": "The usher checks the brass ledger: status 'deferred'. The seat returns an error, never a made-up substitute, and the room applauds the honesty."
+    },
+    {
+      "setup": "Invite the Gallery down from the balcony to do improv with the main stage.",
+      "punchline": "DialoGPT Guest: 'That sounds fun! What do you like to do for fun?' It has been cheerfully changing the subject since before it was cool."
+    },
+    {
+      "setup": "How does the Gallery score a joke?",
+      "punchline": "The brass ledger: 'ok: 3. error: 0. timeout: 1. stopped: 0. unattempted: everything funnier.' The unattempted column gets the biggest laugh."
+    }
+  ],
+  "interactions": [
+    "Take a seat and heckle politely. The Gallery heckles back with provenance.",
+    "Ask any guest what they actually said. They will show you the receipt, pinned to a checkpoint revision.",
+    "Read the brass ledger at the rail: five statuses, honestly counted, no column padded."
+  ]
+}
