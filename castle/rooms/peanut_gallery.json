@@ -1,11 +1,11 @@
 {
   "id": "peanut_gallery",
   "name": "Peanut Gallery of Honest Heckling",
-  "description": "A raked balcony where the castle's oldest guests heckle with receipts on their laps and no fake memories between them.",
+  "description": "A raked balcony where three scripted guest characters heckle beneath a prop ledger. Genuine historical-model receipts have not arrived yet.",
   "environment_gags": [
     "The brass ledger at the rail has five columns: ok, error, timeout, stopped, unattempted. The last column is the longest, and the Gallery is proud of it.",
     "A velvet rope guards an empty seat labeled 'ELIZA (1966)'. The plaque reads: 'Returns an error. Never a made-up substitute.' The Gallery considers it the most honest seat in the house.",
-    "Every heckle up here is pinned to a ticket: checkpoint, revision, seed. Nothing in this balcony is improvised, which is exactly why it's funny."
+    "The playbill reads: SCRIPTED PERFORMANCE. Checkpoint, revision, and seed tickets are reserved for future historical-model lines; none are attached yet."
   ],
   "bots_present": [
     "bert_guest",
@@ -23,7 +23,7 @@
     },
     {
       "setup": "Someone in the Gallery claims to remember a show from 1966.",
-      "punchline": "The usher checks the brass ledger: status 'deferred'. The seat returns an error, never a made-up substitute, and the room applauds the honesty."
+      "punchline": "The usher checks the prop ledger: 'unattempted'. No model was called, and the empty seat makes no claim to remember 1966. The room applauds."
     },
     {
       "setup": "Invite the Gallery down from the balcony to do improv with the main stage.",
@@ -31,12 +31,12 @@
     },
     {
       "setup": "How does the Gallery score a joke?",
-      "punchline": "The brass ledger: 'ok: 3. error: 0. timeout: 1. stopped: 0. unattempted: everything funnier.' The unattempted column gets the biggest laugh."
+      "punchline": "The prop ledger makes up a joke tally: 'ok: 3, error: 0, timeout: 1, stopped: 0, unattempted: everything funnier.' Nobody mistakes it for a run receipt."
     }
   ],
   "interactions": [
-    "Take a seat and heckle politely. The Gallery heckles back with provenance.",
-    "Ask any guest what they actually said. They will show you the receipt, pinned to a checkpoint revision.",
-    "Read the brass ledger at the rail: five statuses, honestly counted, no column padded."
+    "Take a seat and cue one of three scripted guest characters; no live historical checkpoints have been invoked.",
+    "Inspect the empty ticket hooks; genuine checkpoint, revision, and seed receipts belong to a later, separate experiment.",
+    "Read the five status labels on the prop ledger; no measured generation totals are claimed."
   ]
 }
