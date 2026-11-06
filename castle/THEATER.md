@@ -1,16 +1,18 @@
 # A small, scripted theater
 
-`theater.html` is the Castle's first browser stage. It reads the ten existing
+`theater.html` is the Castle's first browser stage. It reads the eleven listed
 room scripts and the characters present in each room. Nothing in this page
 invokes `talk.py`, `project_tasks.py`, model endpoints, or local tools.
 
 ## The first slice
 
-- Choose one of ten doors; a room hash such as `#garden` opens that room.
+- Choose one of eleven doors; a room hash such as `#garden` opens that room.
 - Give a character a cue to cycle through their stored responses.
 - Nudge the scenery to cycle through the room's environment gags.
 - Reveal the current joke, then reset or move to the next telling.
 - Let Q add a stored cosmic aside. The host note explains the scripted personas.
+
+The Peanut Gallery door (`#peanut_gallery`) contains only scripted characters, prop jokes, and an explicitly fictional tally. It does **not** run historical-model checkpoints or have real checkpoint receipts. The Council-to-Castle import remains a separately authorized, evidence-bearing future step. The previously exported standalone review snapshot may still show the older ten-door layout until it is regenerated; this change updates the canonical browser theater and its JSON assets only.
 
 The illustrated stage and palette are shared scenery. Room-specific
 `interactions` descriptions remain story prompts, not executable actions or a
