@@ -1,0 +1,56 @@
+{
+  "schema_version": "castle-peanut-gallery-preflight/0.1",
+  "preflight_id": "peanut-gallery-preflight-20261122",
+  "date_utc": "2026-11-22",
+  "author_seat": "Z (Vibe/Mistral), preflight operator",
+  "owner_request": "Run the #30 + #31 preflight; keep the receipts on a separate testable branch (Mark, in-thread 2026-11-22).",
+  "scope": "Offline verification replication against both PR heads, code review of the #31 diff, and a standalone review-build check. No merges were performed, no model inference was run, no CI runs were dispatched, no credentials used, $0 spend.",
+  "heads": {
+    "pr30": {
+      "branch": "content/peanut-gallery-2026-10-31",
+      "head_sha": "a88117039cba7a40ee1033d1225c81b289b7b917",
+      "tree_source": "codeload tarball refs/heads/content/peanut-gallery-2026-10-31"
+    },
+    "pr31_stacked_on_pr30": {
+      "branch": "sol/peanut-gallery-next-step-20261106",
+      "head_sha": "0eca8014d3440f3998f5a4a26eb6d6f460320d0a",
+      "tree_source": "codeload tarball refs/heads/sol/peanut-gallery-next-step-20261106"
+    }
+  },
+  "checks_per_head": {
+    "json_parse_all_tracked": { "pr30": {"files": 47, "failed": 0}, "pr31": {"files": 47, "failed": 0} },
+    "node_syntax_castle_scripts": { "pr30": {"files": 5, "failed": 0}, "pr31": {"files": 5, "failed": 0} },
+    "py_compile_all_tracked": { "pr30": {"files": 14, "failed": 0}, "pr31": {"files": 16, "failed": 0} },
+    "cli_help": { "pr30": "ok (talk.py, project_tasks.py)", "pr31": "ok (talk.py, project_tasks.py)" },
+    "unittest_discover_tests": {
+      "pr30": {"ran": 99, "errors": 10, "failures": 0},
+      "pr31": {"ran": 102, "errors": 10, "failures": 0},
+      "new_modules_pr31": "tests/test_peanut_gallery_stage.py: 3 tests, all ok (registry/cast match, single theater allowlist entry, scripted-room receipt honesty)"
+    },
+    "preexisting_error_set": "All 10 errors on both heads are test_verify.py verifier self-tests that require a git binary; the set is identical on unmodified main (baseline) and is enumerated as pre-existing, not caused by either PR: accidentally_tracked_private_data_fails_without_copying_contents, existing_evidence_is_never_overwritten, failing_tests_and_invalid_json_do_not_hide_independent_checks, missing_git_does_not_prevent_test_suites_or_help, missing_node_is_explicit_failure_and_later_checks_still_run, skipped_tests_fail_explicitly_and_private_output_is_refused, staged_whitespace_is_checked_in_addition_to_committed_changes, success_discovers_counts_without_reading_untracked_live_data, test_process_has_no_provider_credentials_and_network_is_blocked, zero_tests_and_expected_failures_are_reported_without_green.",
+    "whitespace_scan_changed_files": "clean on both heads (no trailing whitespace, final newlines present) for every file changed by either PR"
+  },
+  "standalone_review_build_check_pr31": {
+    "command": "python3 scripts/build_offline_castle_review.py --output dist/castle-review-offline.html",
+    "result": {"rooms": 11, "bundled_scripts": 24, "bytes": 51756, "dup_peanut_gallery_allowlist_entries": 1},
+    "workflow_invariants_replicated_locally": "PASS (module script, __reviewScripts, offline fetch shim, connect-src 'none', no remote src/href, HTML parses, peanut_gallery present)"
+  },
+  "z_code_review_of_pr31_diff": {
+    "room_receipt_claim_corrections": "ACCEPTED. The original room prose asserted checkpoint/revision/seed tickets and a counted brass ledger before any real receipts existed. #31 re-labels them as scripted characters, a prop ledger, ticket hooks reserved for future lines, and the ELIZA seat as 'unattempted' with no claim to remember 1966. This matches the Peanut Gallery's own honesty rules (errors and honest nulls, never a made-up substitute) and is funnier for it.",
+    "theater_wiring": "ACCEPTED. Single explicit allowlist entry; the eleventh door; THEATER.md updated honestly including the stale-snapshot caveat.",
+    "registry_sync": "ACCEPTED. registry/rooms.csv description now byte-identical to the room JSON, enforced by the new test (this incidentally fixes the trailing-period convention drift noted in the original #30 handoff).",
+    "flag_for_pr31_body": "NON-BLOCKING DISCREPANCY. The PR body's 'Explicit exclusions' says 'No ... CI workflow updates', but the diff adds .github/workflows/castle-offline-review.yml plus the builder and stage tests. The workflow itself is benign (build-only, contents:read, no model calls, artifact upload for private local review), but the body should be corrected so the record matches the diff.",
+    "verdict": "APPROVE with the body correction noted. #31 is a correct, honest, well-tested follow-on; stacked stacking order preserved (base = #30 head)."
+  },
+  "caveats_honest": [
+    "Hosted CI check-run outcome could not be read from this workstation: the GitHub connector exposes no check-run tool, and anonymous API access was rate-limited. The offline-verification.yml workflow triggers on pull_request, so hosted runs exist for both heads; their green/red status is UNVERIFIED here.",
+    "No git binary exists in the sandbox (package installation forbidden), so scripts/verify.py itself (which uses git ls-files for tracked discovery) was not executed; the offline equivalent of each of its check classes was replicated individually instead, as itemized above. Hosted CI is the authoritative full gate."
+  ],
+  "verdict": "Both heads pass every offline preflight check that can be run in this environment. No new blockers found. PR #30 and PR #31 are each one click from merging, in that order (#31 is stacked on #30).",
+  "next_actions": [
+    "Mark: merge #30 (content-only, policy v0), then re-point/review #31 against merged main (or merge as-is; the stack is byte-verified against #30's head a881170).",
+    "Owner-gated afterwards: correct the #31 PR body exclusions line.",
+    "Unstarted (Layer 1, Mark-gated): castle_heckle_packet.json + local CPU run in MarkDude-design/peanut-gallery to turn the prop ledger into a real receipt."
+  ],
+  "environment": "Remote Linux sandbox; Python 3.13, Node v24; no git binary; package installation forbidden by sandbox policy; repo trees fetched as codeload tarballs (public repo, no credentials)."
+}
