@@ -10,6 +10,7 @@ const rooms = [
   {id: 'boiler_room', name: 'Boiler room', vibe: 'Honesty under pressure'},
   {id: 'vinyl_vault', name: 'Vinyl vault', vibe: 'Beats before time'},
   {id: 'guest_book_nook', name: 'Guest book nook', vibe: 'Sign in; get a receipt'},
+  {id: 'peanut_gallery', name: 'Peanut Gallery', vibe: 'Heckles with provenance'},
 ];
 const botIds = new Set(['lightbringer', 'bert_guest', 'gpt2_guest', 'dialogpt_guest',
   'q_overlay', 'dj_love', 'camus_bots', 'meraki', 'safety_siren',

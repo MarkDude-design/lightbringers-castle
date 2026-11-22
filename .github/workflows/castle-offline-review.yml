@@ -1,0 +1,54 @@
+name: Castle — offline review handoff
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/build_offline_castle_review.py'
+      - 'castle/**'
+      - '.github/workflows/castle-offline-review.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Build one-file browser review (no models)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build standalone HTML from the current Castle content
+        run: |
+          set -euo pipefail
+          python scripts/build_offline_castle_review.py --output dist/castle-review-offline.html
+      - name: Check it has no remote dependencies or broken room inventory
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          s = Path('dist/castle-review-offline.html').read_text(encoding='utf-8')
+          assert '<script type="module">' in s
+          assert 'const __reviewScripts = ' in s
+          assert 'const fetch = async (p)' in s
+          assert "connect-src 'none'" in s
+          assert '<style>' in s
+          assert 'peanut_gallery' in s
+          assert 'voice-review-notes' in s
+          assert 'src="http' not in s and 'href="http' not in s
+          class HTMLCheck(HTMLParser):
+              pass
+          HTMLCheck().feed(s)
+          print('HTML parsed and offline invariants present; bytes:', len(s.encode()))
+          PY
+      - name: Upload standalone file for private local review
+        uses: actions/upload-artifact@v4
+        with:
+          name: castle-offline-review
+          path: dist/castle-review-offline.html
+          retention-days: 14
+          if-no-files-found: error
